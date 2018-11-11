@@ -7,12 +7,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
+import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
 import com.python.cat.potato.viewmodel.CalendarFragmentVM;
@@ -54,6 +57,29 @@ public class CalendarFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         LogUtils.d(view + " , " + savedInstanceState);
 
+        initOperationLayout(view);
+        initShowDataLayout(view);
+    }
+
+    private void initShowDataLayout(View view) {
+        if (getActivity() == null) {
+            throw new RuntimeException("activity == null");
+        }
+        ViewGroup showDataLayout = view.findViewById(R.id.fragment_calendar_show_data_layout);
+        showDataLayout.setVisibility(View.VISIBLE);
+        RecyclerView showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
+        showDataRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        CalendarInfoAdapter adapter = new CalendarInfoAdapter(getActivity());
+        showDataRecyclerView.setAdapter(adapter);
+        addDisposable(
+                mCalendarVM.queryAllEventsSimple(getActivity())
+                        .subscribe(adapter::setCalendarInfoList)
+        );
+    }
+
+    private void initOperationLayout(View view) {
+        View operationLayout = view.findViewById(R.id.fragment_calendar_operation_layout);
+        operationLayout.setVisibility(View.GONE);
         view.findViewById(R.id.btn_query_calendar_events)
                 .setOnClickListener(v -> {
                     LogUtils.v("");
@@ -68,7 +94,7 @@ public class CalendarFragment extends BaseFragment {
                                 LogUtils.v("....");
                                 addDisposable(
                                         mCalendarVM.queryAllEvents(activity).subscribe(
-                                        LogUtils::d, Throwable::printStackTrace)
+                                                LogUtils::d, Throwable::printStackTrace)
                                 );
                             })
                             .onDenied(permissions -> {

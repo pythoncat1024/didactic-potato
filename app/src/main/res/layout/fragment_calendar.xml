@@ -1,40 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#6f00"
-    android:orientation="vertical"
-    android:padding="10dp"
     tools:context=".fragment.CalendarFragment">
 
-    <Button
-        android:id="@+id/btn_query_calendar_events"
+    <LinearLayout
+        android:id="@+id/fragment_calendar_operation_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/query_calendar_events" />
+        android:layout_height="match_parent"
+        android:background="#6f00"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-    <Button
-        android:id="@+id/btn_add_calendar_events"
+        <Button
+            android:id="@+id/btn_query_calendar_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/query_calendar_events" />
+
+        <Button
+            android:id="@+id/btn_add_calendar_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/add_calendar_event" />
+
+        <Button
+            android:id="@+id/btn_delete_calendar_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/delete_calendar_event" />
+
+        <Button
+            android:id="@+id/btn_update_calendar_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/update_calendar_event" />
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_calendar_show_data_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/add_calendar_event" />
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-    <Button
-        android:id="@+id/btn_delete_calendar_events"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/delete_calendar_event" />
+        <android.support.v7.widget.RecyclerView
+            android:fadeScrollbars="true"
+            android:id="@+id/fragment_calendar_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
 
-    <Button
-        android:id="@+id/btn_update_calendar_events"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/update_calendar_event" />
-
-
-</LinearLayout>
+        </android.support.v7.widget.RecyclerView>
+    </FrameLayout>
+</FrameLayout>

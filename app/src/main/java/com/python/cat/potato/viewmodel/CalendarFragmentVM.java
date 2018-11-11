@@ -14,9 +14,12 @@ import java.util.Locale;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class CalendarFragmentVM {
+
+    public static final String SORT_ORDER = "_id DESC";
 
     /**
      * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
@@ -36,7 +39,7 @@ public class CalendarFragmentVM {
             throw new RuntimeException("ContentResolver==null");
         }
         Cursor cursor = resolver
-                .query(uri, null, null, null, null);
+                .query(uri, null, null, null, SORT_ORDER);
         if (cursor == null) {
             throw new RuntimeException("Cursor == null");
         }
@@ -106,7 +109,7 @@ public class CalendarFragmentVM {
                 "duration",
         };
         Cursor cursor = resolver
-                .query(uri, projection, null, null, null);
+                .query(uri, projection, null, null, SORT_ORDER);
         if (cursor == null) {
             throw new RuntimeException("Cursor == null");
         }
@@ -151,7 +154,8 @@ public class CalendarFragmentVM {
                     emitter.onComplete();
                 },
                 BackpressureStrategy.ERROR)
-                .subscribeOn(Schedulers.computation());
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Flowable<List<String>> queryAllEvents(Context context) {
@@ -163,6 +167,7 @@ public class CalendarFragmentVM {
                     emitter.onComplete();
                 },
                 BackpressureStrategy.ERROR)
-                .subscribeOn(Schedulers.computation());
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }
