@@ -49,4 +49,5 @@
     <string name="delete_event_or_not">删除该事件吗 ?</string>
     <string name="positive_button_text">确认</string>
     <string name="negative_button_text">取消</string>
+    <string name="cal_delete_popup_window_title">我是删除弹窗的标题</string>
 </resources>

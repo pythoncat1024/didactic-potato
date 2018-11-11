@@ -4,11 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
         android:id="@+id/popup_calendar_show_data_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:gravity="center"
+            android:text="@string/cal_delete_popup_window_title"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
 
         <android.support.v4.widget.SwipeRefreshLayout
@@ -27,5 +36,5 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </LinearLayout>
 </FrameLayout>
