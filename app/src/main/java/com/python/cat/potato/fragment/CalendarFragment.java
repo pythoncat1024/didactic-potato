@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import com.python.cat.potato.R;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
+import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 import com.yanzhenjie.permission.AndPermission;
 
@@ -80,6 +82,12 @@ public class CalendarFragment extends BaseFragment {
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
+
+        FloatingActionButton fabAdd = view.findViewById(R.id.fragment_calendar_fab_add);
+        fabAdd.setOnClickListener(v -> {
+            LogUtils.v("");
+            ToastHelper.show(getActivity(), "add ...");
+        });
     }
 
     private void initOperationLayout(View view) {
