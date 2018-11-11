@@ -9,9 +9,13 @@ import android.view.View;
 
 import com.apkfuns.logutils.LogUtils;
 
-public abstract class BaseFragment extends Fragment {
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+
+public abstract class BaseFragment extends Fragment implements HandleDisposable {
 
     private TitleHook hook;
+    private CompositeDisposable compositeDisposable;
 
     @Override
     public void onAttach(Context context) {
@@ -40,5 +44,31 @@ public abstract class BaseFragment extends Fragment {
         }
 
         LogUtils.d(hook + " , " + getClass().getSimpleName());
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        compositeDisposable = new CompositeDisposable();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.dispose();
+            compositeDisposable = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void addDisposable(Disposable disposable) {
+        if (compositeDisposable != null && disposable != null) {
+            compositeDisposable.add(disposable);
+        } else {
+            throw new RuntimeException("error: "
+                    + compositeDisposable + " ### " + disposable);
+        }
     }
 }

@@ -19,4 +19,29 @@
     <string name="add_calendar_event">添加日历事件</string>
     <string name="delete_calendar_event">删除日历事件</string>
     <string name="update_calendar_event">更新日历事件</string>
+
+    <!--
+
+
+    // events info
+
+
+    private String location;
+    private String duration;
+
+    -->
+    <string name="calendar_id">CalendarID:%1$s</string>
+    <string name="calendar_display_name">CalendarDisplayName:%1$s</string>
+    <string name="calendar_account_name">CalendarAccountName:%1$s</string>
+    <string name="event_title">EventTitle:%1$s</string>
+    <string name="event_id">EventID:%1$s</string>
+    <string name="event_all_day">EventAllDay:%1$s</string>
+    <string name="event_timezone">EventTimeZone:%1$s</string>
+    <string name="event_description">EventDescription:%1$s</string>
+    <string name="event_dirty">EventDirty:%1$s</string>
+    <string name="event_dt_start">EventStart:%1$s</string>
+    <string name="event_dt_end">EventEnd:%1$s</string>
+    <string name="event_dt_r_rule">EventRRule:%1$s</string>
+    <string name="event_duration">EventDuration:%1$s</string>
+    <string name="event_location">EventLocation:%1$s</string>
 </resources>

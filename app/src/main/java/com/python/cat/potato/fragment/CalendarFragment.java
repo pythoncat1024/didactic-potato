@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,6 @@ import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
 import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 import com.yanzhenjie.permission.AndPermission;
-import com.yanzhenjie.permission.Permission;
 
 /**
  * calendar
@@ -59,12 +59,17 @@ public class CalendarFragment extends BaseFragment {
                     LogUtils.v("");
                     LogUtils.v("query..");
                     AndPermission.with(this)
-                            .permission(Manifest.permission.READ_CALENDAR)
-                            .permission(Manifest.permission.WRITE_CALENDAR)
+                            .permission(Manifest.permission.WRITE_CALENDAR,
+                                    Manifest.permission.READ_CALENDAR)
                             .onGranted(permissions -> {
                                 // Storage permission are allowed.
                                 LogUtils.v("success " + permissions);
-                                mCalendarVM.queryCalendarEvents(getActivity());
+                                final FragmentActivity activity = getActivity();
+                                LogUtils.v("....");
+                                addDisposable(
+                                        mCalendarVM.queryAllEvents(activity).subscribe(
+                                        LogUtils::d, Throwable::printStackTrace)
+                                );
                             })
                             .onDenied(permissions -> {
                                 // Storage permission are not allowed.
