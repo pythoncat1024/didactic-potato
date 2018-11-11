@@ -1,7 +1,7 @@
 package com.python.cat.potato.fragment;
 
+import android.Manifest;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,12 +9,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
+import com.python.cat.potato.viewmodel.CalendarFragmentVM;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
 
 /**
  * calendar
@@ -25,6 +27,8 @@ import com.python.cat.potato.base.OnFragmentInteractionListener;
  */
 public class CalendarFragment extends BaseFragment {
 
+
+    private CalendarFragmentVM mCalendarVM;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -54,6 +58,19 @@ public class CalendarFragment extends BaseFragment {
                 .setOnClickListener(v -> {
                     LogUtils.v("");
                     LogUtils.v("query..");
+                    AndPermission.with(this)
+                            .permission(Manifest.permission.READ_CALENDAR)
+                            .permission(Manifest.permission.WRITE_CALENDAR)
+                            .onGranted(permissions -> {
+                                // Storage permission are allowed.
+                                LogUtils.v("success " + permissions);
+                                mCalendarVM.queryCalendarEvents(getActivity());
+                            })
+                            .onDenied(permissions -> {
+                                // Storage permission are not allowed.
+                                LogUtils.e("fail " + permissions);
+                            })
+                            .start();
                 });
 
         view.findViewById(R.id.btn_add_calendar_events)
@@ -78,10 +95,12 @@ public class CalendarFragment extends BaseFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mCalendarVM = new CalendarFragmentVM();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mCalendarVM = null;
     }
 }
