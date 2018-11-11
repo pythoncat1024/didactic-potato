@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
-import com.python.cat.potato.activity.AddEventsActivity;
+import com.python.cat.potato.activity.EventEditActivity;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
@@ -91,7 +91,7 @@ public class CalendarFragment extends BaseFragment {
         fabAdd.setOnClickListener(v -> {
             LogUtils.v("");
             ToastHelper.show(getActivity(), "add ...");
-            Intent intent = new Intent(getActivity(), AddEventsActivity.class);
+            Intent intent = new Intent(getActivity(), EventEditActivity.class);
             startActivityForResult(intent, REQUEST_ADD_EVENTS);
         });
     }

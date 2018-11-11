@@ -33,7 +33,7 @@
             android:name=".activity.BottomActivity"
             android:label="@string/title_activity_bottom" />
         <activity
-            android:name=".activity.AddEventsActivity"
+            android:name=".activity.EventEditActivity"
             android:label="@string/add_calendar_event" />
     </application>
 

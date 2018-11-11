@@ -9,15 +9,19 @@ import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
 
-public class AddEventsActivity extends BaseActivity {
+public class EventEditActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_events);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_event_edit);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.empty);
         setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
     }
 
     @Override

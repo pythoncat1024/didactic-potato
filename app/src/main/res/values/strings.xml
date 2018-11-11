@@ -13,7 +13,6 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="query_calendar_events">查询日历事件</string>
     <string name="add_calendar_event">添加日历事件</string>
@@ -21,17 +20,18 @@
     <string name="update_calendar_event">更新日历事件</string>
     <string name="events_count">日历中事件总数: %1$d</string>
     <string name="empty">""</string>
+    <string name="tip_input_title">请输入事件标题</string>
+    <string name="text_start_time">开始时间</string>
+    <string name="text_end_time">结束时间</string>
+    <string name="text_all_day">全天事件</string>
+    <string name="text_remind">提醒</string>
+    <string name="text_repeat">重复</string>
+    <string name="text_account">日历账户</string>
+    <string name="text_timezone">时区</string>
+    <string name="hint_location">请输入地点</string>
+    <string name="hint_description">请输入备注</string>
 
-    <!--
 
-
-    // events info
-
-
-    private String location;
-    private String duration;
-
-    -->
     <string name="calendar_id">CalendarID:%1$s</string>
     <string name="calendar_display_name">CalendarDisplayName:%1$s</string>
     <string name="calendar_account_name">CalendarAccountName:%1$s</string>

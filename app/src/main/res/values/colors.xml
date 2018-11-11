@@ -5,4 +5,8 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorTransparent">@android:color/transparent</color>
     <color name="white">@android:color/white</color>
+    <color name="whitePressed">#eee</color>
+    <color name="black">@android:color/black</color>
+    <color name="gray">#eee</color>
+    <color name="line_divider">#eee</color>
 </resources>

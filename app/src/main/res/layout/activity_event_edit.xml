@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:divider="@drawable/line_divider"
+        android:dividerPadding="10dp"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        tools:context=".activity.EventEditActivity">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:navigationIcon="@drawable/ic_close_black_24dp"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:title="@string/empty">
+
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/add_calendar_event"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <EditText
+            android:id="@+id/event_et_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/line_item_selector"
+            android:hint="@string/tip_input_title"
+            android:inputType="text"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp"
+            android:textCursorDrawable="@drawable/text_cursor_drawable" />
+
+        <Switch
+            android:id="@+id/event_all_day_switch"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="@drawable/line_item_selector"
+            android:checked="true"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp"
+            android:text="@string/text_all_day" />
+
+        <FrameLayout
+            android:id="@+id/event_start_time_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_start_time"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_start_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="2018年11月11日16:49:47" />
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/event_end_time_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_end_time"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_end_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="2018年11月11日16:49:47" />
+        </FrameLayout>
+
+
+        <FrameLayout
+            android:id="@+id/event_remind_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_remind"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_remind_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="活动开始前" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/event_repeat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_repeat"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_repeat_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="一次性活动" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/event_account_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_account"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_account_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="大猫日历" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/event_timezone_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/line_item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/text_timezone"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/event_timezone_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/gray"
+                tools:text="(GMT+8:00 北京)" />
+        </FrameLayout>
+
+        <EditText
+            android:id="@+id/event_et_location"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="@drawable/line_item_selector"
+            android:hint="@string/hint_location"
+            android:inputType="text"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="@dimen/item_padding_end"
+            android:textCursorDrawable="@drawable/text_cursor_drawable" />
+
+        <EditText
+            android:id="@+id/event_et_description"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_height"
+            android:background="@drawable/line_item_selector"
+            android:hint="@string/hint_description"
+            android:inputType="text"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="@dimen/item_padding_end"
+            android:textCursorDrawable="@drawable/text_cursor_drawable" />
+    </LinearLayout>
+
+
+</ScrollView>
