@@ -6,8 +6,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Events;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -20,26 +18,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
-import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.CalDeletePop;
-import com.python.cat.potato.viewmodel.CalendarFragmentVM;
+import com.python.cat.potato.viewmodel.CalendarVM;
 import com.yanzhenjie.permission.AndPermission;
 
-import org.json.JSONObject;
-import org.reactivestreams.Subscription;
-
 import java.util.Objects;
-
-import io.reactivex.Flowable;
-import io.reactivex.functions.Consumer;
 
 /**
  * calendar
@@ -97,7 +87,7 @@ public class CalendarFragment extends BaseFragment {
         adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
         addDisposable(
-                CalendarFragmentVM.queryAllEventsSimple(getActivity())
+                CalendarVM.queryAllEventsSimple(getActivity())
                         .subscribe(infoList -> {
                             ToastHelper.show(getActivity(), getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
@@ -108,7 +98,7 @@ public class CalendarFragment extends BaseFragment {
             itemLongClick(info, adapterPosition);
         });
         refreshLayout.setOnRefreshListener(() -> addDisposable(
-                CalendarFragmentVM.queryAllEventsSimple(getActivity())
+                CalendarVM.queryAllEventsSimple(getActivity())
                         .doOnError(e -> ToastHelper.show(getActivity(), "刷新失败..."))
                         .subscribe(infoList -> {
                                     adapter.setCalendarInfoList(infoList);
@@ -156,14 +146,14 @@ public class CalendarFragment extends BaseFragment {
         String desc = "我是随便插入的事件的描述 " + extraPos;
         boolean allDay = false;
 
-        long start = CalendarFragmentVM.createStartTime();
-        long end = CalendarFragmentVM.createEndTime(start);
+        long start = CalendarVM.createStartTime();
+        long end = CalendarVM.createEndTime(start);
         String timezone = "Asia/Shanghai";
         String location = "我是随便弄的一个地点 " + extraPos;
         //noinspection ConstantConditions
-        addDisposable(CalendarFragmentVM.insertEvent(context, title, desc, allDay,
+        addDisposable(CalendarVM.insertEvent(context, title, desc, allDay,
                 start, end, timezone, location)
-                .flatMap(insert -> CalendarFragmentVM.queryEventByID(context, ContentUris.parseId(insert)))
+                .flatMap(insert -> CalendarVM.queryEventByID(context, ContentUris.parseId(insert)))
                 .doOnError(e -> extraPos += 1)
                 .doOnComplete(() -> extraPos += 1)
                 .subscribe(
@@ -195,7 +185,7 @@ public class CalendarFragment extends BaseFragment {
 
     private void doDelete(String info, int adapterPosition) {
         addDisposable(
-                CalendarFragmentVM.deleteByCustom(getContext(), info)
+                CalendarVM.deleteByCustom(getContext(), info)
                         .subscribe(rows -> {
                             LogUtils.d("after delete: " + rows);
                             if (rows > 0) {
@@ -223,7 +213,7 @@ public class CalendarFragment extends BaseFragment {
                                 final FragmentActivity activity = getActivity();
                                 LogUtils.v("....");
                                 addDisposable(
-                                        CalendarFragmentVM.queryAllEvents(activity).subscribe(
+                                        CalendarVM.queryAllEvents(activity).subscribe(
                                                 LogUtils::d, Throwable::printStackTrace)
                                 );
                             })

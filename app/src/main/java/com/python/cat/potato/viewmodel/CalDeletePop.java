@@ -3,7 +3,6 @@ package com.python.cat.potato.viewmodel;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -77,7 +76,7 @@ public class CalDeletePop {
         adapter = new CalendarInfoAdapter(mContext);
         mDataRecyclerView.setAdapter(adapter);
         addDisposable(
-                CalendarFragmentVM.queryAllEventsHadMessageID(mContext)
+                CalendarVM.queryAllEventsHadMessageID(mContext)
                         .subscribe(infoList -> {
                             ToastHelper.show(mContext, mContext.getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
@@ -89,7 +88,7 @@ public class CalDeletePop {
         });
 
         refreshLayout.setOnRefreshListener(() -> addDisposable(
-                CalendarFragmentVM.queryAllEventsHadMessageID(mContext)
+                CalendarVM.queryAllEventsHadMessageID(mContext)
                         .doOnError(e -> ToastHelper.show(mContext, "刷新失败..."))
                         .subscribe(infoList -> {
                                     adapter.setCalendarInfoList(infoList);
@@ -133,7 +132,7 @@ public class CalDeletePop {
 
     private void doDelete(int messageID, int adapterPosition) {
         addDisposable(
-                CalendarFragmentVM.deleteEventByMessageID(
+                CalendarVM.deleteEventByMessageID(
                         mContext, messageID)
                         .subscribe(rows -> {
                             LogUtils.d("after delete: " + rows);

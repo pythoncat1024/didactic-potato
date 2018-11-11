@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.python.cat.potato.R;
-import com.python.cat.potato.viewmodel.CalendarFragmentVM;
+import com.python.cat.potato.viewmodel.CalendarVM;
 
 import android.widget.TextView;
 
@@ -68,7 +68,7 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
         });
 
         try {
-            String jsonWithTime = CalendarFragmentVM.formatJsonWithTime(info);
+            String jsonWithTime = CalendarVM.formatJsonWithTime(info);
             vh.tvText.setText(jsonWithTime);
         } catch (JSONException e) {
             e.printStackTrace();
