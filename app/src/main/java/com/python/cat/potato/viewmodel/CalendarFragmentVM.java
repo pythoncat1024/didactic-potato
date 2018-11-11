@@ -8,16 +8,21 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Attendees;
+import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.reactivestreams.Publisher;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -25,9 +30,10 @@ import java.util.TimeZone;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class CalendarFragmentVM {
@@ -39,32 +45,28 @@ public class CalendarFragmentVM {
      * <br/>
      * 查询全部的日历事件，包含<b>全部的</b>事件字段
      */
-    private List<String> _queryCalendarEvents(Context context) {
+    private List<String> _queryCalendarEvents(Context context) throws JSONException {
         ArrayList<String> infoList = new ArrayList<>();
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
         LogUtils.i("query calendar events...");
-        String CALENDER_EVENT_URL = "content://com.android.calendar/events";
-        Uri uri = Uri.parse(CALENDER_EVENT_URL);
         ContentResolver resolver = context.getContentResolver();
         if (resolver == null) {
             throw new RuntimeException("ContentResolver==null");
         }
         Cursor cursor = resolver
-                .query(uri, null, null, null, SORT_ORDER);
+                .query(Events.CONTENT_URI, null, null,
+                        null, SORT_ORDER);
         if (cursor == null) {
             throw new RuntimeException("Cursor == null");
         }
         int columnCount = cursor.getColumnCount();
         LogUtils.d("columnCount :" + columnCount);// 多少个属性
-        StringBuilder line = new StringBuilder();
         int row = 0; // 第几行
 //        line.append("all info: [\n");
         while (cursor.moveToNext()) {
-            line.delete(0, line.length()); // 每次进来清空
-            line.append("row ").append(row).append(" : ")
-                    .append("{");
+            JSONObject jObj = new JSONObject();
             for (int i = 0; i < columnCount; i++) {
                 //获取到属性的名称
                 String columnName = cursor.getColumnName(i);
@@ -72,17 +74,88 @@ public class CalendarFragmentVM {
                 String message = cursor.getString(cursor.getColumnIndex(columnName));
                 //打印属性和对应的值
 //                LogUtils.d(columnName + " : " + message);
-                String format = String.format(Locale.getDefault()
-                        , "\n\"%s\" -> \"%s\"", columnName, message);
-                line.append(format);
+                jObj.put(columnName, message);
             }
-            line.append("\n").append("}").append("\n");
-            infoList.add(line.toString());
+            infoList.add(formatJson(jObj));
             row += 1;
         }
-        line.append("\n] end...");
-        LogUtils.i(line);
-        LogUtils.getLog2FileConfig().flushAsync();
+        cursor.close();
+        return infoList;
+    }
+
+
+    private String _queryEventById(Context context, long eventID) throws JSONException {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        LogUtils.i("query calendar events...");
+        ContentResolver resolver = context.getContentResolver();
+        if (resolver == null) {
+            throw new RuntimeException("ContentResolver==null");
+        }
+        String selection = String.format(Locale.ENGLISH, "%s = ?", Events._ID);
+        String[] selectionArgs = new String[]{String.valueOf(eventID)};
+        Cursor cursor = resolver
+                .query(Events.CONTENT_URI, null, selection,
+                        selectionArgs, SORT_ORDER);
+        if (cursor == null) {
+            throw new RuntimeException("Cursor == null");
+        }
+        int columnCount = cursor.getColumnCount();
+        LogUtils.d("columnCount :" + columnCount); // 多少个属性
+        JSONObject obj = new JSONObject();
+        if (cursor.moveToNext()) {
+            for (int i = 0; i < columnCount; i++) {
+                // 获取到属性的名称
+                String columnName = cursor.getColumnName(i);
+                // 获取到属性对应的值
+                String message = cursor.getString(cursor.getColumnIndex(columnName));
+                // 打印属性和对应的值
+                obj.put(columnName, message);
+            }
+        }
+        LogUtils.json(obj.toString());
+        cursor.close();
+        return obj.toString();
+    }
+
+    private List<String> _queryEventsByMessageID(Context context, long messageID) throws JSONException {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        LogUtils.i("query calendar events...");
+        ContentResolver resolver = context.getContentResolver();
+        if (resolver == null) {
+            throw new RuntimeException("ContentResolver==null");
+        }
+        ArrayList<String> infoList = new ArrayList<>();
+        String selection = String.format(Locale.ENGLISH, "%s = ?",
+                Events.CUSTOM_APP_PACKAGE);
+        String[] selectionArgs = new String[]{String.valueOf(messageID)};
+        Cursor cursor = resolver
+                .query(Events.CONTENT_URI, null, selection,
+                        selectionArgs, SORT_ORDER);
+        if (cursor == null) {
+            throw new RuntimeException("Cursor == null");
+        }
+        int columnCount = cursor.getColumnCount();
+        LogUtils.d("columnCount :" + columnCount); // 多少个属性
+        StringBuilder line = new StringBuilder();
+        while (cursor.moveToNext()) {
+            JSONObject obj = new JSONObject();
+            for (int i = 0; i < columnCount; i++) {
+                // 获取到属性的名称
+                String columnName = cursor.getColumnName(i);
+                // 获取到属性对应的值
+                String message = cursor.getString(cursor.getColumnIndex(columnName));
+                // 打印属性和对应的值
+                obj.put(columnName, message);
+            }
+            line.append(obj.toString());
+            line.append("\n");
+            infoList.add(formatJson(obj));
+        }
+        LogUtils.d(line);
         cursor.close();
         return infoList;
     }
@@ -92,7 +165,7 @@ public class CalendarFragmentVM {
      * <br/>
      * 查询全部的日历事件，包含<b>主要的</b>事件字段
      */
-    private List<String> _queryCalendarEventsSimple(Context context) {
+    private List<String> _queryCalendarEventsSimple(Context context) throws JSONException {
         ArrayList<String> infoList = new ArrayList<>();
         if (context == null) {
             throw new RuntimeException("Context == null");
@@ -130,36 +203,20 @@ public class CalendarFragmentVM {
         }
         int columnCount = cursor.getColumnCount();
         LogUtils.d("columnCount :" + columnCount);// 多少个属性
-        StringBuilder line = new StringBuilder();
-        int row = 0; // 第几行
 //        line.append("all info: [\n");
         while (cursor.moveToNext()) {
-            line.delete(0, line.length()); // 每次进来清空
-            line.append("row ").append(row).append(" : ")
-                    .append("{");
+            JSONObject obj = new JSONObject();
             for (int i = 0; i < columnCount; i++) {
                 //获取到属性的名称
                 String columnName = cursor.getColumnName(i);
                 //获取到属性对应的值
                 String message = cursor.getString(cursor.getColumnIndex(columnName));
-                if (columnName.equals(Events.DTSTART)
-                        || columnName.equals(Events.DTEND)
-                        || columnName.equals(Events.LAST_DATE)) {
-                    if (!TextUtils.isEmpty(message)) {
-                        message += " # " + formatTime(Long.parseLong(message));
-                    }
-                }
                 //打印属性和对应的值
 //                LogUtils.d(columnName + " : " + message);
-                String format = String.format(Locale.getDefault()
-                        , "\n\"%s\" -> \"%s\"", columnName, message);
-                line.append(format);
+                obj.put(columnName, message);
             }
-            line.append("\n").append("}").append("\n");
-            infoList.add(line.toString());
-            row += 1;
+            infoList.add(formatJson(obj));
         }
-        line.append("\n] end...");
 //        LogUtils.i(line);
 //        LogUtils.getLog2FileConfig().flushAsync();
         cursor.close();
@@ -186,6 +243,32 @@ public class CalendarFragmentVM {
                 {
                     List<String> stringList = _queryCalendarEvents(context);
                     emitter.onNext(stringList);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public Flowable<List<String>> queryEventsByMessageID(Context context, long messageID) {
+        return Flowable.create((FlowableOnSubscribe<List<String>>) emitter ->
+                {
+                    List<String> stringList = _queryEventsByMessageID(context, messageID);
+                    emitter.onNext(stringList);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Flowable<String> queryEventByID(Context context, long eventID) {
+        return Flowable.create((FlowableOnSubscribe<String>) emitter ->
+                {
+
+                    String info = _queryEventById(context, eventID);
+                    emitter.onNext(info);
                     emitter.onComplete();
                 },
                 BackpressureStrategy.ERROR)
@@ -338,18 +421,121 @@ public class CalendarFragmentVM {
     }
 
 
-//    private int _deleteEvent(Context context){
-//        long ID = 20; //这个id一定是要表中_id的值，不能是calendar_id的值。
-//        ContentResolver cr = getContentResolver();
-//        ContentValues values = new ContentValues();
-//        Uri deleteUri = null;
-//        deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventID);
-//        int rows = getContentResolver().delete(deleteUri, null, null);
-//        Log.i(DEBUG_TAG, "Rows deleted: " + rows);
-//    }
-//
+    private int _deleteEventByMessageID(Context context, int messageID) {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        ContentResolver cr = context.getContentResolver();
+        if (cr == null) {
+            throw new RuntimeException("ContentResolver == null");
+        }
+        String where = String.format(Locale.ENGLISH, "%s = ?", Events.CUSTOM_APP_PACKAGE);
+        String[] selectionArgs = new String[]{String.valueOf(messageID)};
+        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
+        return rows;
+    }
 
-    public long createStartTime() {
+    private int _deleteEventByID(Context context, int eventID) {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        ContentResolver cr = context.getContentResolver();
+        if (cr == null) {
+            throw new RuntimeException("ContentResolver == null");
+        }
+//      Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventID);
+        String where = String.format(Locale.ENGLISH, "%s = ?", Events._ID);
+        String[] selectionArgs = new String[]{String.valueOf(eventID)};
+        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
+        return rows;
+    }
+
+    private int _deleteByCustom(Context context, String where, String[] selectionArgs) {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        ContentResolver cr = context.getContentResolver();
+        if (cr == null) {
+            throw new RuntimeException("ContentResolver == null");
+        }
+        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
+        return rows;
+    }
+
+    public Flowable<Integer> deleteByCustom(Context context, String where,
+                                            String[] selectionArgs) {
+        return Flowable.create((FlowableOnSubscribe<Integer>) emitter -> {
+                    int delete = _deleteByCustom(context, where, selectionArgs);
+                    emitter.onNext(delete);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Flowable<Integer> deleteByCustom(Context context, String info) {
+        return Flowable.create((FlowableOnSubscribe<JSONObject>) emitter -> {
+                    JSONObject object = new JSONObject(info);
+                    emitter.onNext(object);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .flatMap((Function<JSONObject, Publisher<Integer>>) json ->
+                {
+                    String selection = null;
+                    String[] selectionArgs;
+                    Iterator<String> keys = json.keys();
+                    StringBuilder keyBuff = new StringBuilder();
+                    ArrayList<String> values = new ArrayList<>();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        String value = json.getString(key);
+                        String keyItem = String.format(Locale.ENGLISH,
+                                "%s = ? and ", key);
+                        keyBuff.append(keyItem);
+                        values.add(value);
+                    }
+                    String temp = keyBuff.toString();
+                    if (temp.endsWith(" and ")) {
+                        selection = temp.substring(0, temp.length() - " and ".length());
+                    }
+                    selectionArgs = values.toArray(new String[0]);
+                    LogUtils.d("custom delete...");
+                    LogUtils.d(selection);
+                    LogUtils.d(selectionArgs);
+                    return deleteByCustom(context, selection, selectionArgs);
+                });
+    }
+
+
+    public Flowable<Integer> deleteEventByMessageID(Context context, int messageID) {
+        return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
+                {
+                    int delete = _deleteEventByMessageID(context, messageID);
+                    emitter.onNext(delete);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Flowable<Integer> deleteEventByID(Context context, int eventID) {
+        return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
+                {
+                    int delete = _deleteEventByID(context, eventID);
+                    emitter.onNext(delete);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public static long createStartTime() {
         Calendar instance = Calendar.getInstance();
         instance.set(Calendar.YEAR, instance.get(Calendar.YEAR));
         instance.set(Calendar.MONTH, instance.get(Calendar.MONTH));
@@ -361,14 +547,14 @@ public class CalendarFragmentVM {
         return instance.getTimeInMillis();
     }
 
-    public long createEndTime(long timeInMillis) {
+    public static long createEndTime(long timeInMillis) {
         Calendar instance = Calendar.getInstance();
         instance.setTimeInMillis(timeInMillis);
         instance.add(Calendar.MINUTE, new Random().nextInt(110) + 10);
         return instance.getTimeInMillis();
     }
 
-    public String formatTime(long timeInMillis) {
+    public static String formatTime(long timeInMillis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
         String formatTime = String.format(Locale.getDefault(),
@@ -382,5 +568,64 @@ public class CalendarFragmentVM {
                 calendar.get(Calendar.MILLISECOND)
         );
         return formatTime;
+    }
+
+    /**
+     * 将 json 换行显示
+     */
+    private static String formatJson(String json) throws JSONException {
+        JSONObject object = new JSONObject(json);
+        return formatJson(object);
+    }
+
+    /**
+     * 将 json 换行显示
+     */
+    public static String formatJsonWithTime(String json) throws JSONException {
+        JSONObject object = new JSONObject(json);
+        return formatJsonWithTime(object);
+    }
+
+    private static String formatJson(JSONObject json) throws JSONException {
+        Iterator<String> keys = json.keys();
+        StringBuilder line = new StringBuilder();
+        line.append("{");
+        while (keys.hasNext()) {
+            String key = keys.next();
+            String value = json.getString(key);
+            String format = String.format(Locale.getDefault()
+                    , "\n\t\"%s\":\"%s\",", key, value);
+            line.append(format);
+        }
+        if (line.charAt(line.length() - 1) == ',') {
+            line.deleteCharAt(line.length() - 1);
+        }
+        line.append("\n").append("}");
+        return line.toString();
+    }
+
+    private static String formatJsonWithTime(JSONObject json) throws JSONException {
+        Iterator<String> keys = json.keys();
+        StringBuilder line = new StringBuilder();
+        line.append("{");
+        while (keys.hasNext()) {
+            String key = keys.next();
+            String value = json.getString(key);
+            if (key.equals(Events.DTSTART)
+                    || key.equals(Events.DTEND)
+                    || key.equals(Events.LAST_DATE)) {
+                if (!TextUtils.isEmpty(value)) {
+                    value += " # " + formatTime(Long.parseLong(value));
+                }
+            }
+            String format = String.format(Locale.getDefault()
+                    , "\n\t\"%s\":\"%s\",", key, value);
+            line.append(format);
+        }
+        if (line.charAt(line.length() - 1) == ',') {
+            line.deleteCharAt(line.length() - 1);
+        }
+        line.append("\n").append("}");
+        return line.toString();
     }
 }

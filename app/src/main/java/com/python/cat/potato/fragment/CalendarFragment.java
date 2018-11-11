@@ -30,6 +30,19 @@ import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 import com.yanzhenjie.permission.AndPermission;
 
 import org.json.JSONObject;
+import org.reactivestreams.Publisher;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Objects;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * calendar
@@ -95,19 +108,7 @@ public class CalendarFragment extends BaseFragment {
 
         adapter.setOnItemLongClickListener((targetView, info) -> {
             // 删除事件
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(info)
-                    .setCancelable(true)
-                    .setPositiveButton(
-                            R.string.positive_button_text,
-                            (dialog, which) -> {
-                                // todo delete
-                                // todo delete
-                                String brand = android.os.Build.BRAND;
-                                LogUtils.w("delete " + brand);
-                            })
-                    .setTitle(R.string.delete_event_or_not);
-            builder.show();
+            itemLongClick(info);
         });
         FloatingActionButton fabAdd = view.findViewById(R.id.fragment_calendar_fab_add);
         fabAdd.setOnClickListener(v -> {
@@ -150,6 +151,34 @@ public class CalendarFragment extends BaseFragment {
                     .subscribe());
         });
 
+    }
+
+    private void itemLongClick(String info) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(info)
+                .setCancelable(true)
+                .setPositiveButton(
+                        R.string.positive_button_text,
+                        (dialog, which) -> {
+                            LogUtils.d("delete....");
+                            LogUtils.json(info);
+                            doDelete(info);
+                        })
+                .setTitle(R.string.delete_event_or_not);
+        builder.show();
+    }
+
+    private void doDelete(String info) {
+        addDisposable(
+                mCalendarVM.deleteByCustom(getContext(), info)
+                        .subscribe(rows -> {
+                            LogUtils.d("after delete: " + rows);
+                            if (rows > 0) {
+                                ToastHelper.show(Objects.requireNonNull(getContext()),
+                                        "delete success.." + rows);
+                            }
+                        }, Throwable::printStackTrace)
+        );
     }
 
     private void initOperationLayout(View view) {

@@ -8,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.python.cat.potato.R;
+import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 
 import android.widget.TextView;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +51,21 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
     public void onBindViewHolder(@NonNull VH vh, int position) {
         int adapterPosition = vh.getAdapterPosition();
         String info = mInfoList.get(adapterPosition);
-        vh.tvText.setText(info);
-
         vh.itemView.setOnLongClickListener(v -> {
             if (mItemLongClickListener != null) {
                 mItemLongClickListener.click(vh.itemView, info);
             }
             return true;
         });
+
+        try {
+            String jsonWithTime = CalendarFragmentVM.formatJsonWithTime(info);
+            vh.tvText.setText(jsonWithTime);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            vh.tvText.setText(info);
+        }
+
     }
 
     @Override
