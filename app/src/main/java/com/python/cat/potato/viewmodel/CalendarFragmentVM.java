@@ -1,11 +1,14 @@
 package com.python.cat.potato.viewmodel;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Reminders;
@@ -18,11 +21,13 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class CalendarFragmentVM {
@@ -188,37 +193,66 @@ public class CalendarFragmentVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * from: https://blog.csdn.net/mysimplelove/article/details/81018641
+     */
+    private static long checkCalendarAccount(Context context) {
+        Cursor userCursor = context.getContentResolver().query(Calendars.CONTENT_URI,
+                null, null, null, null);
+        try {
+            if (userCursor == null) { // 查询返回空值
+                return -1;
+            }
+            int count = userCursor.getCount();
+            if (count > 0) { // 存在现有账户，取第一个账户的id返回
+                userCursor.moveToFirst();
+                return userCursor.getInt(userCursor.getColumnIndex(CalendarContract.Calendars._ID));
+            } else {
+                return -1;
+            }
+        } finally {
+            if (userCursor != null) {
+                userCursor.close();
+            }
+        }
+    }
 
     /**
-     * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
+     * from: https://blog.csdn.net/mysimplelove/article/details/81018641
+     * 添加日历账户
      */
-    private void blogInsert(Context context) {
+    private static Uri addCalendarAccount(Context context) {
+        String calendarName = "custom";
+        String accountName = "custom@test.com";
+        String accountType = "com.android.custom";
+        String displayName = "自定义日历账户";
+        TimeZone timeZone = TimeZone.getDefault();
+        LogUtils.d(timeZone);
+        LogUtils.d(timeZone.getID());
+        ContentValues value = new ContentValues();
+        value.put(CalendarContract.Calendars.NAME, calendarName);
+        value.put(CalendarContract.Calendars.ACCOUNT_NAME, accountName);
+        value.put(CalendarContract.Calendars.ACCOUNT_TYPE, accountType);
+        value.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, displayName);
+        value.put(CalendarContract.Calendars.VISIBLE, 1);
+        value.put(CalendarContract.Calendars.CALENDAR_COLOR, Color.BLUE);
+        value.put(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+                CalendarContract.Calendars.CAL_ACCESS_OWNER);
+        value.put(CalendarContract.Calendars.SYNC_EVENTS, 1);
+        value.put(CalendarContract.Calendars.CALENDAR_TIME_ZONE, timeZone.getID());
+        value.put(CalendarContract.Calendars.OWNER_ACCOUNT, accountName);
+        value.put(CalendarContract.Calendars.CAN_ORGANIZER_RESPOND, 0);
 
-        String calID = "1";
-        long startMillis = 0;
-        long endMillis = 0;
-        Calendar beginTime = Calendar.getInstance();
-        beginTime.set(2012, 9, 14, 7, 30);
-        startMillis = beginTime.getTimeInMillis();
-        Calendar endTime = Calendar.getInstance();
-        endTime.set(2012, 9, 14, 8, 45);
-        endMillis = endTime.getTimeInMillis();
-
-
-        ContentResolver cr = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(Events.DTSTART, startMillis);
-        values.put(Events.DTEND, endMillis);
-        values.put(Events.TITLE, "Jazzercise");
-        values.put(Events.DESCRIPTION, "Group workout");
-        values.put(Events.CALENDAR_ID, calID);
-        values.put(Events.EVENT_TIMEZONE, "America/Los_Angeles");
-        Uri uri = cr.insert(Events.CONTENT_URI, values);          //插入数据的实际操作
-
-// get the event ID that is the last element in the Uri
-        long eventID = Long.parseLong(uri.getLastPathSegment());
-//
-// ... do something with event ID，比如添加提醒事件（往提醒表添加数据），或者其他事件
+        Uri calendarUri = Calendars.CONTENT_URI;
+        calendarUri = calendarUri.buildUpon()
+                .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME,
+                        accountName)
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE,
+                        accountType)
+                .build();
+        Uri result = context.getContentResolver().insert(calendarUri, value);
+        return result;
     }
 
 
@@ -238,7 +272,6 @@ public class CalendarFragmentVM {
         // 1. 插入到事件表
         ContentValues eventInfo = new ContentValues();
         // todo
-        // todo
         // todo 这一块是硬编码，实际上应该是从其他地方获取的
 //        eventInfo.put(Events.ACCOUNT_NAME, "upmail@exlab.com");
 //        eventInfo.put(Events.ACCOUNT_TYPE, "Local");
@@ -251,8 +284,7 @@ public class CalendarFragmentVM {
             eventInfo.put(Events.CALENDAR_ID, 15); // upmail
             LogUtils.d("insert calendar_id: " + 15);
         }
-        // todo
-        // todo
+        eventInfo.put(Events.CUSTOM_APP_PACKAGE, "自定义字段..."); // ok
         eventInfo.put(Events.TITLE, title);
         eventInfo.put(Events.DESCRIPTION, desc);
         eventInfo.put(Events.DTSTART, start);
@@ -268,7 +300,7 @@ public class CalendarFragmentVM {
         if (insert != null) {
             String lastPathSegment = insert.getLastPathSegment();
             // 2. 插入到参加者表
-            long eventID = Long.parseLong(lastPathSegment);
+            long eventID = ContentUris.parseId(insert);
             LogUtils.v("eventID: " + lastPathSegment + " ## " + eventID);
             ContentValues attendeeInfo = new ContentValues();
             attendeeInfo.put(Attendees.ATTENDEE_NAME, "Tom猫");
