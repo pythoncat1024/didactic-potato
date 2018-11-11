@@ -46,4 +46,7 @@
     <string name="event_dt_r_rule">EventRRule:%1$s</string>
     <string name="event_duration">EventDuration:%1$s</string>
     <string name="event_location">EventLocation:%1$s</string>
+    <string name="delete_event_or_not">删除该事件吗 ?</string>
+    <string name="positive_button_text">确认</string>
+    <string name="negative_button_text">取消</string>
 </resources>

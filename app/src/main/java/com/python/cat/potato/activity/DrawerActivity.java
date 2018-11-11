@@ -37,7 +37,9 @@ public class DrawerActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        FrameLayout contentFrameLayout = findViewById(R.id.drawer_content_frame_layout);
+
+        // default show calendar
+        showCalendarFragment();
     }
 
     @Override
@@ -95,18 +97,22 @@ public class DrawerActivity extends BaseActivity
 
         } else if (id == R.id.nav_calendar) {
             // calendar
-            com.apkfuns.logutils.LogUtils.v("click nav calendar...");
-            CalendarFragment fragment = CalendarFragment.newInstance();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.drawer_content_frame_layout, fragment);
-//            transaction.addToBackStack(null);
-            transaction.commit();
+            showCalendarFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showCalendarFragment() {
+        com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+        CalendarFragment fragment = CalendarFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.drawer_content_frame_layout, fragment);
+//            transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override

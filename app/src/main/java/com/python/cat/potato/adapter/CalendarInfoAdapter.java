@@ -20,6 +20,8 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
 
     private Context mContext;
 
+    private OnItemLongClickListener mItemLongClickListener;
+
     public CalendarInfoAdapter(@NonNull Context context) {
         this.mContext = context;
     }
@@ -47,6 +49,13 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
         int adapterPosition = vh.getAdapterPosition();
         String info = mInfoList.get(adapterPosition);
         vh.tvText.setText(info);
+
+        vh.itemView.setOnLongClickListener(v -> {
+            if (mItemLongClickListener != null) {
+                mItemLongClickListener.click(vh.itemView, info);
+            }
+            return true;
+        });
     }
 
     @Override
@@ -62,4 +71,16 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
             tvText = itemView.findViewById(R.id.item_event_info);
         }
     }
+
+
+    public interface OnItemLongClickListener {
+
+        void click(View targetView, String info);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.mItemLongClickListener = listener;
+    }
+
+
 }
