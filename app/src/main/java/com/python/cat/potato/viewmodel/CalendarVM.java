@@ -15,7 +15,6 @@ import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
-import com.python.cat.potato.global.GlobalInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,8 +35,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public class CalendarFragmentVM {
-    private CalendarFragmentVM() {
+public class CalendarVM {
+    private CalendarVM() {
     }
 
     private static final String SORT_ORDER = "_id DESC";
@@ -432,8 +431,7 @@ public class CalendarFragmentVM {
      * 添加日历账户
      */
     private static Uri _addCalendarAccount(Context context, String calendarName,
-                                           String accountName, String accountType) {
-        String displayName = "自定义日历账户";
+                                           String accountName, String accountType, String displayName) {
         TimeZone timeZone = TimeZone.getDefault();
         LogUtils.d(timeZone);
         LogUtils.d(timeZone.getID());
@@ -463,10 +461,12 @@ public class CalendarFragmentVM {
         return result;
     }
 
-    public static Flowable<Uri> addCalendarAccount(Context context, String calendarName,
-                                                   String accountName, String accountType) {
+    public static Flowable<Uri> addCalendarAccount(Context context,
+                                                   String calendarName, String accountName,
+                                                   String accountType, String displayName) {
         return Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
-            emitter.onNext(_addCalendarAccount(context, calendarName, accountName, accountType));
+            emitter.onNext(_addCalendarAccount(context,
+                    calendarName, accountName, accountType, displayName));
             emitter.onComplete();
 
         }, BackpressureStrategy.ERROR)
@@ -483,8 +483,10 @@ public class CalendarFragmentVM {
      * 3. 插入到提醒表 Attendees（可选，如果有提醒的话）
      * </pre>
      */
-    private static Uri _insertEvent(Context context, long calendarID, String title, String desc, boolean allDay,
-                                    long start, long end, String timezone, String location) {
+    private static Uri _insertEvent(Context context, long calendarID,
+                                    String title, String desc, boolean allDay,
+                                    long start, long end,
+                                    String timezone, String location) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -538,15 +540,17 @@ public class CalendarFragmentVM {
                                             boolean allDay, long start, long end,
                                             String timezone, String location) {
 
-        String calendarName = GlobalInfo.calendarName;
-        String accountName = GlobalInfo.accountName;
-        String accountType = GlobalInfo.accountType;
-
+        String calendarName = "custom";
+        String accountName = "custom@test.com";
+        String accountType = "com.android.custom";
+        String displayName = "自定义日历账户";
         return Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
             long calendarID;
-            while ((calendarID = _checkCalendarAccount(context, calendarName, accountName, accountType))
+            while ((calendarID = _checkCalendarAccount(context,
+                    calendarName, accountName, accountType))
                     == -1) {
-                Uri addedAccount = _addCalendarAccount(context, calendarName, accountName, accountType);
+                Uri addedAccount = _addCalendarAccount(context,
+                        calendarName, accountName, accountType, displayName);
                 LogUtils.d("没有自定义账户的时候，默认添加自定义账户");
                 calendarID = ContentUris.parseId(addedAccount);
                 if (calendarID != -1) {
