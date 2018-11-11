@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
@@ -67,13 +68,17 @@ public class CalendarFragment extends BaseFragment {
         }
         ViewGroup showDataLayout = view.findViewById(R.id.fragment_calendar_show_data_layout);
         showDataLayout.setVisibility(View.VISIBLE);
+        TextView tvHeader = view.findViewById(R.id.text_event_count);
         RecyclerView showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
         showDataRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         CalendarInfoAdapter adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
         addDisposable(
                 mCalendarVM.queryAllEventsSimple(getActivity())
-                        .subscribe(adapter::setCalendarInfoList)
+                        .subscribe(infoList -> {
+                            tvHeader.setText(getString(R.string.events_count, infoList.size()));
+                            adapter.setCalendarInfoList(infoList);
+                        }, Throwable::printStackTrace)
         );
     }
 
