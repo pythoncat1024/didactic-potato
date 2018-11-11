@@ -27,6 +27,7 @@ import com.python.cat.potato.R;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
+import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.CalDeletePop;
 import com.python.cat.potato.viewmodel.CalendarFragmentVM;
@@ -67,7 +68,6 @@ public class CalendarFragment extends BaseFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -170,7 +170,7 @@ public class CalendarFragment extends BaseFragment {
                         next -> {
                             adapter.addList(next);
                             ToastHelper.show(Objects.requireNonNull(getActivity()),
-                                    "添加成功..."+next);
+                                    "添加成功..." + next);
                             LogUtils.w("insert:" + next);
                         },
                         Throwable::printStackTrace)

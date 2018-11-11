@@ -15,6 +15,7 @@ import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
+import com.python.cat.potato.global.GlobalInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -350,7 +351,7 @@ public class CalendarFragmentVM {
     /**
      * from: https://blog.csdn.net/mysimplelove/article/details/81018641
      */
-    private static long checkCalendarAccount(Context context) {
+    private static long _checkCalendarAccount(Context context) {
         Cursor userCursor = context.getContentResolver().query(Calendars.CONTENT_URI,
                 null, null, null, null);
         try {
@@ -371,14 +372,67 @@ public class CalendarFragmentVM {
         }
     }
 
+    private static long _checkCalendarAccount(Context context, String calendarName,
+                                              String accountName, String accountType) {
+        String[] projection = new String[]{
+                Calendars.NAME,
+                Calendars.ACCOUNT_NAME,
+                Calendars.ACCOUNT_TYPE,
+                Calendars._ID
+        };
+        String selection = String.format(Locale.ENGLISH,
+                "%s = ? and %s = ? and %s = ?",
+                projection[0], projection[1], projection[2]);
+        String[] selectionArgs = new String[]{
+                calendarName, accountName, accountType
+        };
+        Cursor cursor = context.getContentResolver().query(Calendars.CONTENT_URI,
+                projection, selection, selectionArgs, null);
+        try {
+            if (cursor == null) { // 查询返回空值
+                return -1;
+            }
+            int count = cursor.getCount();
+            if (count > 0) { // 存在现有账户，取第一个账户的id返回
+//                return cursor.getInt(cursor.getColumnIndex(CalendarContract.Calendars._ID));
+                while (cursor.moveToNext()) {
+                    String calName = cursor.getString(cursor.getColumnIndex(projection[0]));
+                    String accName = cursor.getString(cursor.getColumnIndex(projection[1]));
+                    String accType = cursor.getString(cursor.getColumnIndex(projection[2]));
+                    long calendarID = cursor.getLong(cursor.getColumnIndex(projection[3]));
+                    LogUtils.d(accName + " , " + accountName
+                            + " , " + accountType + " , " + calendarID);
+                    if (calendarName.equals(calName)
+                            && accountName.equals(accName)
+                            && accountType.equals(accType)) {
+                        return calendarID;
+                    }
+                }
+            }
+            return -1;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static Flowable<Long> checkAccount(Context context, String calendarName,
+                                              String accountName, String accountType) {
+        return Flowable.create((FlowableOnSubscribe<Long>) emitter -> {
+            emitter.onNext(_checkCalendarAccount(context, calendarName, accountName, accountType));
+            emitter.onComplete();
+        }, BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     /**
      * from: https://blog.csdn.net/mysimplelove/article/details/81018641
      * 添加日历账户
      */
-    private static Uri addCalendarAccount(Context context) {
-        String calendarName = "custom";
-        String accountName = "custom@test.com";
-        String accountType = "com.android.custom";
+    private static Uri _addCalendarAccount(Context context, String calendarName,
+                                           String accountName, String accountType) {
         String displayName = "自定义日历账户";
         TimeZone timeZone = TimeZone.getDefault();
         LogUtils.d(timeZone);
@@ -409,6 +463,17 @@ public class CalendarFragmentVM {
         return result;
     }
 
+    public static Flowable<Uri> addCalendarAccount(Context context, String calendarName,
+                                                   String accountName, String accountType) {
+        return Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
+            emitter.onNext(_addCalendarAccount(context, calendarName, accountName, accountType));
+            emitter.onComplete();
+
+        }, BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     /**
      * <pre>
@@ -418,26 +483,17 @@ public class CalendarFragmentVM {
      * 3. 插入到提醒表 Attendees（可选，如果有提醒的话）
      * </pre>
      */
-    private static Uri _insertEvent(Context context, String title, String desc, boolean allDay,
+    private static Uri _insertEvent(Context context, long calendarID, String title, String desc, boolean allDay,
                                     long start, long end, String timezone, String location) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
         // 1. 插入到事件表
         ContentValues eventInfo = new ContentValues();
-        // todo
-        // todo 这一块是硬编码，实际上应该是从其他地方获取的
-//        eventInfo.put(Events.ACCOUNT_NAME, "upmail@exlab.com");
-//        eventInfo.put(Events.ACCOUNT_TYPE, "Local");
         String brand = android.os.Build.BRAND;
         LogUtils.e(String.format(Locale.getDefault(), "brand=[%s]", brand));
-        if ("Xiaomi".equals(brand)) {
-            eventInfo.put(Events.CALENDAR_ID, 4); // 小米金融
-            LogUtils.d("insert calendar_id: " + 4);
-        } else {
-            eventInfo.put(Events.CALENDAR_ID, 15); // upmail
-            LogUtils.d("insert calendar_id: " + 15);
-        }
+        eventInfo.put(Events.CALENDAR_ID, calendarID);
+        LogUtils.d("insert calendar_id: " + calendarID);
         String customField = String.valueOf(new Random().nextInt(1024) + 111); // 自定义字段
         eventInfo.put(Events.CUSTOM_APP_PACKAGE, customField); // ok
         eventInfo.put(Events.TITLE, title);
@@ -482,8 +538,24 @@ public class CalendarFragmentVM {
                                             boolean allDay, long start, long end,
                                             String timezone, String location) {
 
+        String calendarName = GlobalInfo.calendarName;
+        String accountName = GlobalInfo.accountName;
+        String accountType = GlobalInfo.accountType;
+
         return Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
-            Uri uri = _insertEvent(context, title, desc,
+            long calendarID;
+            while ((calendarID = _checkCalendarAccount(context, calendarName, accountName, accountType))
+                    == -1) {
+                Uri addedAccount = _addCalendarAccount(context, calendarName, accountName, accountType);
+                LogUtils.d("没有自定义账户的时候，默认添加自定义账户");
+                calendarID = ContentUris.parseId(addedAccount);
+                if (calendarID != -1) {
+                    break;
+                }
+            }
+            LogUtils.d("已有自定义账户，就可以添加事件了.");
+
+            Uri uri = _insertEvent(context, calendarID, title, desc,
                     allDay, start, end, timezone, location);
             emitter.onNext(uri);
             emitter.onComplete();
