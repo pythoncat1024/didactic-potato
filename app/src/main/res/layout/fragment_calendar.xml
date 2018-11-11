@@ -5,43 +5,36 @@
     android:layout_height="match_parent"
     android:background="#6f00"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".fragment.CalendarFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <Switch
-        android:id="@+id/switch1"
+    <Button
+        android:id="@+id/btn_query_calendar_events"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Switch" />
+        android:layout_margin="10dp"
+        android:text="@string/query_calendar_events" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_add_calendar_events"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:layout_margin="10dp"
+        android:text="@string/add_calendar_event" />
 
-    <Switch
-        android:id="@+id/switch2"
+    <Button
+        android:id="@+id/btn_delete_calendar_events"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Switch" />
+        android:layout_margin="10dp"
+        android:text="@string/delete_calendar_event" />
 
-    <CheckBox
-        android:id="@+id/checkBox"
+    <Button
+        android:id="@+id/btn_update_calendar_events"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CheckBox" />
-
-    <TextView
-        android:id="@+id/calendar_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
-    <RatingBar
-        android:id="@+id/ratingBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_margin="10dp"
+        android:text="@string/update_calendar_event" />
 
 
 </LinearLayout>

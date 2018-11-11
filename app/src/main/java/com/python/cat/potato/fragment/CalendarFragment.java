@@ -25,7 +25,6 @@ import com.python.cat.potato.base.OnFragmentInteractionListener;
  */
 public class CalendarFragment extends BaseFragment {
 
-    private OnFragmentInteractionListener mListener;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -50,32 +49,39 @@ public class CalendarFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LogUtils.d(view + " , " + savedInstanceState);
-        TextView textView = view.findViewById(R.id.calendar_text);
-        LogUtils.d(textView.getVisibility() + " , " + (textView.getVisibility() == View.VISIBLE));
-        textView.setText("12345678");
+
+        view.findViewById(R.id.btn_query_calendar_events)
+                .setOnClickListener(v -> {
+                    LogUtils.v("");
+                    LogUtils.v("query..");
+                });
+
+        view.findViewById(R.id.btn_add_calendar_events)
+                .setOnClickListener(v -> {
+                    LogUtils.v("");
+                    LogUtils.v("add..");
+                });
+
+        view.findViewById(R.id.btn_delete_calendar_events)
+                .setOnClickListener(v -> {
+                    LogUtils.v("");
+                    LogUtils.v("delete..");
+                });
+
+        view.findViewById(R.id.btn_update_calendar_events)
+                .setOnClickListener(v -> {
+                    LogUtils.v("");
+                    LogUtils.v("update..");
+                });
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-    }
-
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 }
