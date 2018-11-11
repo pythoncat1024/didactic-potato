@@ -13,7 +13,6 @@ public abstract class BaseActivity extends AppCompatActivity
         implements OnFragmentInteractionListener {
 
     private CompositeDisposable compositeDisposable;
-    private TitleHook hook;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

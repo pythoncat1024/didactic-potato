@@ -14,10 +14,12 @@ import android.widget.FrameLayout;
 
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
+import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
 
 public class DrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        TitleHook {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +30,8 @@ public class DrawerActivity extends BaseActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -104,6 +107,13 @@ public class DrawerActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void setToolbarTitle(String simpleName) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(simpleName);
+        setSupportActionBar(toolbar);
     }
 
 }

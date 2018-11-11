@@ -22,6 +22,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
         mainVM = new MainVM();
         TextView tv = findViewById(R.id.tv_text);
@@ -50,5 +51,4 @@ public class MainActivity extends BaseActivity {
         mainVM = null;
         super.onDestroy();
     }
-
 }
