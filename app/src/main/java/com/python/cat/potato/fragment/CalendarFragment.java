@@ -3,7 +3,6 @@ package com.python.cat.potato.fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract.Events;
@@ -12,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,19 +30,11 @@ import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 import com.yanzhenjie.permission.AndPermission;
 
 import org.json.JSONObject;
-import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Locale;
 import java.util.Objects;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.functions.Consumer;
 
 /**
  * calendar
@@ -58,6 +50,8 @@ public class CalendarFragment extends BaseFragment {
     private CalendarFragmentVM mCalendarVM;
 
     static long extraPos = 0;
+    private CalendarInfoAdapter adapter;
+    private RecyclerView showDataRecyclerView;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -93,23 +87,37 @@ public class CalendarFragment extends BaseFragment {
         }
         ViewGroup showDataLayout = view.findViewById(R.id.fragment_calendar_show_data_layout);
         showDataLayout.setVisibility(View.VISIBLE);
-        TextView tvHeader = view.findViewById(R.id.text_event_count);
-        RecyclerView showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.fragment_calendar_swipe_refresh_layout);
+        showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
         showDataRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CalendarInfoAdapter adapter = new CalendarInfoAdapter(getActivity());
+        adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
         addDisposable(
                 mCalendarVM.queryAllEventsSimple(getActivity())
                         .subscribe(infoList -> {
-                            tvHeader.setText(getString(R.string.events_count, infoList.size()));
+                            ToastHelper.show(getActivity(),getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
-
-        adapter.setOnItemLongClickListener((targetView, info) -> {
+        adapter.setOnItemLongClickListener((targetView, info, adapterPosition) -> {
             // 删除事件
-            itemLongClick(info);
+            itemLongClick(info, adapterPosition);
         });
+        refreshLayout.setOnRefreshListener(() -> addDisposable(
+                mCalendarVM.queryAllEventsSimple(getActivity())
+                        .doOnError(e -> ToastHelper.show(getActivity(), "刷新失败..."))
+                        .subscribe(infoList -> {
+                                    adapter.setCalendarInfoList(infoList);
+                                    ToastHelper.show(getActivity(), "刷新成功..."
+                                            +getString(R.string.events_count, infoList.size()));
+                                },
+                                e -> {
+                                    LogUtils.e(e);
+                                    refreshLayout.setRefreshing(false);
+                                },
+                                () -> refreshLayout.setRefreshing(false))
+        ));
+
         FloatingActionButton fabAdd = view.findViewById(R.id.fragment_calendar_fab_add);
         fabAdd.setOnClickListener(v -> {
             // 添加事件
@@ -153,7 +161,7 @@ public class CalendarFragment extends BaseFragment {
 
     }
 
-    private void itemLongClick(String info) {
+    private void itemLongClick(String info, int adapterPosition) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(info)
                 .setCancelable(true)
@@ -162,13 +170,13 @@ public class CalendarFragment extends BaseFragment {
                         (dialog, which) -> {
                             LogUtils.d("delete....");
                             LogUtils.json(info);
-                            doDelete(info);
+                            doDelete(info, adapterPosition);
                         })
                 .setTitle(R.string.delete_event_or_not);
         builder.show();
     }
 
-    private void doDelete(String info) {
+    private void doDelete(String info, int adapterPosition) {
         addDisposable(
                 mCalendarVM.deleteByCustom(getContext(), info)
                         .subscribe(rows -> {
@@ -176,6 +184,7 @@ public class CalendarFragment extends BaseFragment {
                             if (rows > 0) {
                                 ToastHelper.show(Objects.requireNonNull(getContext()),
                                         "delete success.." + rows);
+                                adapter.notifyItemRemoved(adapterPosition);
                             }
                         }, Throwable::printStackTrace)
         );

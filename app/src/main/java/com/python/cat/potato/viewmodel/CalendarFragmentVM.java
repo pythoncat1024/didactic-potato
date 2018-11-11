@@ -30,7 +30,6 @@ import java.util.TimeZone;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
@@ -39,6 +38,71 @@ import io.reactivex.schedulers.Schedulers;
 public class CalendarFragmentVM {
 
     private static final String SORT_ORDER = "_id DESC";
+
+    /**
+     * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
+     * <br/>
+     * 查询全部的日历事件，包含<b>主要的</b>事件字段
+     */
+    private List<String> _queryCalendarEventsSimple(Context context) throws JSONException {
+        ArrayList<String> infoList = new ArrayList<>();
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        LogUtils.i("query calendar events...");
+
+//        String CALENDER_EVENT_URL = "content://com.android.calendar/events";
+//        Uri uri = Uri.parse(CALENDER_EVENT_URL);
+        Uri uri = CalendarContract.Events.CONTENT_URI;
+        ContentResolver resolver = context.getContentResolver();
+        if (resolver == null) {
+            throw new RuntimeException("ContentResolver==null");
+        }
+        String[] projection = new String[]{
+                Events.CALENDAR_ID,
+                Events.ACCOUNT_TYPE,
+                Events.ACCOUNT_NAME,
+                Events.CALENDAR_DISPLAY_NAME,
+                Events._ID,
+                Events.TITLE,
+                Events.DESCRIPTION,
+                Events.EVENT_LOCATION,
+                Events.EVENT_TIMEZONE,
+                Events.DTSTART,
+                Events.DTEND,
+                Events.LAST_DATE,
+                Events.ALL_DAY,
+                Events.RRULE,
+                Events.DURATION,
+                Events.CUSTOM_APP_PACKAGE,
+        };
+        Cursor cursor = resolver
+                .query(uri, projection, null, null, SORT_ORDER);
+        if (cursor == null) {
+            throw new RuntimeException("Cursor == null");
+        }
+        int columnCount = cursor.getColumnCount();
+        LogUtils.d("columnCount :" + columnCount);// 多少个属性
+//        line.append("all info: [\n");
+        while (cursor.moveToNext()) {
+            JSONObject obj = new JSONObject();
+            for (int i = 0; i < columnCount; i++) {
+                //获取到属性的名称
+                String columnName = cursor.getColumnName(i);
+                //获取到属性对应的值
+                String message = cursor.getString(cursor.getColumnIndex(columnName));
+                //打印属性和对应的值
+//                LogUtils.d(columnName + " : " + message);
+                obj.put(columnName, message);
+            }
+            infoList.add(formatJson(obj));
+        }
+//        LogUtils.i(line);
+//        LogUtils.getLog2FileConfig().flushAsync();
+        cursor.close();
+        return infoList;
+    }
+
 
     /**
      * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
@@ -159,70 +223,6 @@ public class CalendarFragmentVM {
         cursor.close();
         return infoList;
     }
-
-    /**
-     * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
-     * <br/>
-     * 查询全部的日历事件，包含<b>主要的</b>事件字段
-     */
-    private List<String> _queryCalendarEventsSimple(Context context) throws JSONException {
-        ArrayList<String> infoList = new ArrayList<>();
-        if (context == null) {
-            throw new RuntimeException("Context == null");
-        }
-        LogUtils.i("query calendar events...");
-
-//        String CALENDER_EVENT_URL = "content://com.android.calendar/events";
-//        Uri uri = Uri.parse(CALENDER_EVENT_URL);
-        Uri uri = CalendarContract.Events.CONTENT_URI;
-        ContentResolver resolver = context.getContentResolver();
-        if (resolver == null) {
-            throw new RuntimeException("ContentResolver==null");
-        }
-        String[] projection = new String[]{
-                Events.CALENDAR_ID,
-                Events.ACCOUNT_TYPE,
-                Events.ACCOUNT_NAME,
-                Events.CALENDAR_DISPLAY_NAME,
-                Events._ID,
-                Events.TITLE,
-                Events.DESCRIPTION,
-                Events.EVENT_LOCATION,
-                Events.EVENT_TIMEZONE,
-                Events.DTSTART,
-                Events.DTEND,
-                Events.LAST_DATE,
-                Events.ALL_DAY,
-                Events.RRULE,
-                Events.DURATION,
-        };
-        Cursor cursor = resolver
-                .query(uri, projection, null, null, SORT_ORDER);
-        if (cursor == null) {
-            throw new RuntimeException("Cursor == null");
-        }
-        int columnCount = cursor.getColumnCount();
-        LogUtils.d("columnCount :" + columnCount);// 多少个属性
-//        line.append("all info: [\n");
-        while (cursor.moveToNext()) {
-            JSONObject obj = new JSONObject();
-            for (int i = 0; i < columnCount; i++) {
-                //获取到属性的名称
-                String columnName = cursor.getColumnName(i);
-                //获取到属性对应的值
-                String message = cursor.getString(cursor.getColumnIndex(columnName));
-                //打印属性和对应的值
-//                LogUtils.d(columnName + " : " + message);
-                obj.put(columnName, message);
-            }
-            infoList.add(formatJson(obj));
-        }
-//        LogUtils.i(line);
-//        LogUtils.getLog2FileConfig().flushAsync();
-        cursor.close();
-        return infoList;
-    }
-
 
     public Flowable<List<String>> queryAllEventsSimple(Context context) {
         return Flowable.create(
