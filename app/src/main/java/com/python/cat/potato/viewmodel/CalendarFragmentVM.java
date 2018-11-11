@@ -1,13 +1,14 @@
 package com.python.cat.potato.viewmodel;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 
 import com.apkfuns.logutils.LogUtils;
@@ -26,7 +27,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CalendarFragmentVM {
 
-    public static final String SORT_ORDER = "_id DESC";
+    private static final String SORT_ORDER = "_id DESC";
 
     /**
      * from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
@@ -101,21 +102,21 @@ public class CalendarFragmentVM {
             throw new RuntimeException("ContentResolver==null");
         }
         String[] projection = new String[]{
-                "calendar_id",
-                "account_type",
-                "account_name",
-                "calendar_displayName",
-                "_id",
-                "title",
-                "description",
-                "eventLocation",
-                "eventTimezone",
-                "dtstart",
-                "dtend",
-                "lastDate",
-                "allDay",
-                "rrule",
-                "duration",
+                Events.CALENDAR_ID,
+                Events.ACCOUNT_TYPE,
+                Events.ACCOUNT_NAME,
+                Events.CALENDAR_DISPLAY_NAME,
+                Events._ID,
+                Events.TITLE,
+                Events.DESCRIPTION,
+                Events.EVENT_LOCATION,
+                Events.EVENT_TIMEZONE,
+                Events.DTSTART,
+                Events.DTEND,
+                Events.LAST_DATE,
+                Events.ALL_DAY,
+                Events.RRULE,
+                Events.DURATION,
         };
         Cursor cursor = resolver
                 .query(uri, projection, null, null, SORT_ORDER);
@@ -221,43 +222,72 @@ public class CalendarFragmentVM {
     }
 
 
+    /**
+     * <pre>
+     * 添加日历事件:
+     * 1. 插入到事件表 Events (必选项)
+     * 2. 插入到参加者表 Reminders （可选，如果有参加者的话）
+     * 3. 插入到提醒表 Attendees（可选，如果有提醒的话）
+     * </pre>
+     */
     private Uri _insertEvent(Context context, String title, String desc, boolean allDay,
                              long start, long end, String timezone, String location) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
-        Uri uri = CalendarContract.Events.CONTENT_URI;
-
-        ContentValues info = new ContentValues();
+        // 1. 插入到事件表
+        ContentValues eventInfo = new ContentValues();
         // todo
         // todo
         // todo 这一块是硬编码，实际上应该是从其他地方获取的
-//        info.put(Events.ACCOUNT_NAME, "upmail@exlab.com");
-//        info.put(Events.ACCOUNT_TYPE, "Local");
+//        eventInfo.put(Events.ACCOUNT_NAME, "upmail@exlab.com");
+//        eventInfo.put(Events.ACCOUNT_TYPE, "Local");
         String brand = android.os.Build.BRAND;
         LogUtils.e(String.format(Locale.getDefault(), "brand=[%s]", brand));
         if ("Xiaomi".equals(brand)) {
-            info.put(Events.CALENDAR_ID, 4); // 小米金融
+            eventInfo.put(Events.CALENDAR_ID, 4); // 小米金融
             LogUtils.d("insert calendar_id: " + 4);
         } else {
-            info.put(Events.CALENDAR_ID, 15); // upmail
+            eventInfo.put(Events.CALENDAR_ID, 15); // upmail
             LogUtils.d("insert calendar_id: " + 15);
         }
         // todo
         // todo
-        info.put(Events.TITLE, title);
-        info.put(Events.DESCRIPTION, desc);
-        info.put(Events.DTSTART, start);
-        info.put(Events.DTEND, end);
-        info.put(Events.ALL_DAY, allDay ? 1 : 0);
-        info.put(Events.EVENT_TIMEZONE, timezone);
-        info.put(Events.EVENT_LOCATION, location);
+        eventInfo.put(Events.TITLE, title);
+        eventInfo.put(Events.DESCRIPTION, desc);
+        eventInfo.put(Events.DTSTART, start);
+        eventInfo.put(Events.DTEND, end);
+        eventInfo.put(Events.ALL_DAY, allDay ? 1 : 0);
+        eventInfo.put(Events.EVENT_TIMEZONE, timezone);
+        eventInfo.put(Events.EVENT_LOCATION, location);
         ContentResolver resolver = context.getContentResolver();
         if (resolver == null) {
             throw new RuntimeException("ContentResolver == null");
         }
-        Uri insert = resolver.insert(uri, info);
-        LogUtils.d("insert=== " + insert);
+        Uri insert = resolver.insert(Events.CONTENT_URI, eventInfo);
+        if (insert != null) {
+            String lastPathSegment = insert.getLastPathSegment();
+            // 2. 插入到参加者表
+            long eventID = Long.parseLong(lastPathSegment);
+            LogUtils.v("eventID: " + lastPathSegment + " ## " + eventID);
+            ContentValues attendeeInfo = new ContentValues();
+            attendeeInfo.put(Attendees.ATTENDEE_NAME, "Tom猫");
+            attendeeInfo.put(Attendees.ATTENDEE_EMAIL, "tomcat@example.com");
+            attendeeInfo.put(Attendees.ATTENDEE_RELATIONSHIP, Attendees.RELATIONSHIP_ATTENDEE);
+            attendeeInfo.put(Attendees.ATTENDEE_TYPE, Attendees.TYPE_OPTIONAL);
+            attendeeInfo.put(Attendees.ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_INVITED);
+            attendeeInfo.put(Attendees.EVENT_ID, eventID);
+            Uri attendee = resolver.insert(Attendees.CONTENT_URI, attendeeInfo);
+            LogUtils.d("after attendee : " + attendee);
+            // 3. 插入到提醒表
+            ContentValues reminderInfo = new ContentValues();
+            reminderInfo.put(Reminders.MINUTES, 60 * 24 * 7); // 一周前
+            reminderInfo.put(Reminders.EVENT_ID, eventID);
+            reminderInfo.put(Reminders.METHOD, Reminders.METHOD_ALERT);
+            Uri reminder = resolver.insert(Reminders.CONTENT_URI, reminderInfo);
+            LogUtils.d("after reminders : " + reminder);
+        }
+        LogUtils.d("after insert : " + insert);
         return insert;
     }
 
