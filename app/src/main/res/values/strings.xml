@@ -20,6 +20,7 @@
     <string name="delete_calendar_event">删除日历事件</string>
     <string name="update_calendar_event">更新日历事件</string>
     <string name="events_count">日历中事件总数: %1$d</string>
+    <string name="empty">""</string>
 
     <!--
 

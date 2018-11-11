@@ -1,7 +1,9 @@
 package com.python.cat.potato.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
+import com.python.cat.potato.activity.AddEventsActivity;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
@@ -34,6 +37,7 @@ import com.yanzhenjie.permission.AndPermission;
 public class CalendarFragment extends BaseFragment {
 
 
+    public static final int REQUEST_ADD_EVENTS = 17;
     private CalendarFragmentVM mCalendarVM;
 
     public CalendarFragment() {
@@ -87,6 +91,8 @@ public class CalendarFragment extends BaseFragment {
         fabAdd.setOnClickListener(v -> {
             LogUtils.v("");
             ToastHelper.show(getActivity(), "add ...");
+            Intent intent = new Intent(getActivity(), AddEventsActivity.class);
+            startActivityForResult(intent, REQUEST_ADD_EVENTS);
         });
     }
 
@@ -146,5 +152,16 @@ public class CalendarFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mCalendarVM = null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ADD_EVENTS
+                && resultCode == Activity.RESULT_OK) {
+            LogUtils.v("return from add events...");
+        } else {
+            LogUtils.e("error? " + requestCode + " , " + resultCode);
+        }
     }
 }

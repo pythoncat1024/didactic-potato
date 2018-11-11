@@ -1,6 +1,6 @@
 package com.python.cat.potato.viewmodel;
 
-import com.python.cat.potato.activity.MainActivity;
+import com.python.cat.potato.activity.WelcomeActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -8,9 +8,9 @@ import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
- * @see MainActivity
+ * @see WelcomeActivity
  */
-public class MainVM {
+public class WelcomeVM {
 
 
     public Flowable<Long> interval(long init) {

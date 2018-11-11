@@ -9,26 +9,26 @@ import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.global.GlobalInfo;
-import com.python.cat.potato.viewmodel.MainVM;
+import com.python.cat.potato.viewmodel.WelcomeVM;
 
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends BaseActivity {
+public class WelcomeActivity extends BaseActivity {
 
-    private MainVM mainVM;
+    private WelcomeVM welcomeVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_welcome);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
-        mainVM = new MainVM();
+        welcomeVM = new WelcomeVM();
         TextView tv = findViewById(R.id.tv_text);
         if (GlobalInfo.SHOW_LOADING) {
 
-            Disposable subscribe = mainVM.interval(GlobalInfo.LOADING_SECONDS)
+            Disposable subscribe = welcomeVM.interval(GlobalInfo.LOADING_SECONDS)
                     .doOnComplete(this::jump2content)
                     .subscribe(t -> {
                                 LogUtils.d("t==" + t);
@@ -48,7 +48,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        mainVM = null;
+        welcomeVM = null;
         super.onDestroy();
     }
 }
