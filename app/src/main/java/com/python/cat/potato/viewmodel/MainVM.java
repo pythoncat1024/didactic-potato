@@ -1,12 +1,14 @@
 package com.python.cat.potato.viewmodel;
 
+import com.python.cat.potato.activity.MainActivity;
+
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
- * @see com.python.cat.potato.MainActivity
+ * @see MainActivity
  */
 public class MainVM {
 

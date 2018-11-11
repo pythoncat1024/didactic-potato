@@ -1,33 +1,23 @@
-package com.python.cat.potato;
+package com.python.cat.potato.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
+import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
+import com.python.cat.potato.fragment.CalendarFragment;
 
 public class DrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    private BottomNavigationView.OnNavigationItemSelectedListener
-            mOnNavigationItemSelectedListener
-            = item -> {
-        switch (item.getItemId()) {
-            case R.id.navigation_public_number:
-                return true;
-            case R.id.navigation_knowledge:
-                return true;
-            case R.id.navigation_open_project:
-                return true;
-        }
-        return false;
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +34,7 @@ public class DrawerActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        FrameLayout contentFrameLayout = findViewById(R.id.drawer_content_frame_layout);
     }
 
     @Override
@@ -98,13 +86,24 @@ public class DrawerActivity extends BaseActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setTitle("send..");
+//            setSupportActionBar(toolbar);
 
+        } else if (id == R.id.nav_calendar) {
+            // calendar
+            com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+            CalendarFragment fragment = CalendarFragment.newInstance();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.drawer_content_frame_layout, fragment);
+//            transaction.addToBackStack(null);
+            transaction.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
 }

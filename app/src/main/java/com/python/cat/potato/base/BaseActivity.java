@@ -1,6 +1,7 @@
 package com.python.cat.potato.base;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -8,9 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity
+        implements OnFragmentInteractionListener {
 
     private CompositeDisposable compositeDisposable;
+    private TitleHook hook;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +48,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void startActivity(Class clazz) {
         startActivity(new Intent(get(), clazz));
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
 }
