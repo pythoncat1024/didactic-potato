@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapter.VH> {
@@ -35,6 +36,14 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
         } else {
             this.mInfoList = new ArrayList<>();
         }
+        notifyDataSetChanged();
+    }
+
+    public void addList(String... infoArgs) {
+        if (mInfoList == null) {
+            mInfoList = new ArrayList<>();
+        }
+        Collections.addAll(mInfoList, infoArgs);
         notifyDataSetChanged();
     }
 

@@ -64,6 +64,7 @@ public class CalendarFragmentVM {
                 Events.ACCOUNT_NAME,
                 Events.CALENDAR_DISPLAY_NAME,
                 Events._ID,
+                Events.CUSTOM_APP_PACKAGE,
                 Events.TITLE,
                 Events.DESCRIPTION,
                 Events.EVENT_LOCATION,
@@ -74,7 +75,6 @@ public class CalendarFragmentVM {
                 Events.ALL_DAY,
                 Events.RRULE,
                 Events.DURATION,
-                Events.CUSTOM_APP_PACKAGE,
         };
         Cursor cursor = resolver
                 .query(uri, projection, null, null, SORT_ORDER);
@@ -367,7 +367,8 @@ public class CalendarFragmentVM {
             eventInfo.put(Events.CALENDAR_ID, 15); // upmail
             LogUtils.d("insert calendar_id: " + 15);
         }
-        eventInfo.put(Events.CUSTOM_APP_PACKAGE, "自定义字段..."); // ok
+        String customField = String.valueOf(new Random().nextInt(1024) + 111); // 自定义字段
+        eventInfo.put(Events.CUSTOM_APP_PACKAGE, customField); // ok
         eventInfo.put(Events.TITLE, title);
         eventInfo.put(Events.DESCRIPTION, desc);
         eventInfo.put(Events.DTSTART, start);

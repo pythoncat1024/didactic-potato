@@ -2,9 +2,11 @@ package com.python.cat.potato.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +36,7 @@ import org.reactivestreams.Subscription;
 
 import java.util.Objects;
 
+import io.reactivex.Flowable;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -95,7 +98,7 @@ public class CalendarFragment extends BaseFragment {
         addDisposable(
                 mCalendarVM.queryAllEventsSimple(getActivity())
                         .subscribe(infoList -> {
-                            ToastHelper.show(getActivity(),getString(R.string.events_count, infoList.size()));
+                            ToastHelper.show(getActivity(), getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
@@ -109,7 +112,7 @@ public class CalendarFragment extends BaseFragment {
                         .subscribe(infoList -> {
                                     adapter.setCalendarInfoList(infoList);
                                     ToastHelper.show(getActivity(), "刷新成功..."
-                                            +getString(R.string.events_count, infoList.size()));
+                                            + getString(R.string.events_count, infoList.size()));
                                 },
                                 e -> {
                                     LogUtils.e(e);
@@ -119,9 +122,13 @@ public class CalendarFragment extends BaseFragment {
         ));
 
         FloatingActionButton fabAdd = view.findViewById(R.id.fragment_calendar_fab_add);
-        fabAdd.setOnClickListener(v -> {
-            // 添加事件
-            LogUtils.v("");
+        fabAdd.setOnClickListener(v -> doAddEvent());
+
+    }
+
+    private void doAddEvent() {
+        // 添加事件
+        LogUtils.v("");
 
 //            Intent intent = new Intent(getActivity(), EventEditActivity.class);
 //            startActivityForResult(intent, REQUEST_ADD_EVENTS);
@@ -129,40 +136,33 @@ public class CalendarFragment extends BaseFragment {
             context, title, desc,
                     allDay, start, end, timezone, location
              */
-            Context context = getContext();
-            String title = "我是随便插入的一个事件 " + extraPos;
-            String desc = "我是随便插入的事件的描述 " + extraPos;
-            boolean allDay = false;
+        Context context = getContext();
+        String title = "我是随便插入的一个事件 " + extraPos;
+        String desc = "我是随便插入的事件的描述 " + extraPos;
+        boolean allDay = false;
 
-            long start = mCalendarVM.createStartTime();
-            long end = mCalendarVM.createEndTime(start);
-            String timezone = "Asia/Shanghai";
-            String location = "我是随便弄的一个地点 " + extraPos;
-            //noinspection ConstantConditions
-            addDisposable(mCalendarVM.insertEvent(context, title, desc, allDay,
-                    start, end, timezone, location)
-                    .doOnComplete(() -> {
-                        extraPos += 1;
-                        JSONObject info = new JSONObject();
-                        info.put(Events.TITLE, title);
-                        info.put(Events.DESCRIPTION, desc);
-                        info.put(Events.DTSTART, mCalendarVM.formatTime(start));
-                        info.put(Events.DTEND, mCalendarVM.formatTime(end));
-                        //noinspection ConstantConditions
-                        info.put(Events.ALL_DAY, allDay);
-                        info.put(Events.CALENDAR_TIME_ZONE, timezone);
-                        info.put(Events.EVENT_LOCATION, location);
-                        LogUtils.d("insert...info ###:->");
-                        LogUtils.json(info.toString());
-                        ToastHelper.show(context, info.toString());
-                    })
-                    .subscribe());
-        });
-
+        long start = CalendarFragmentVM.createStartTime();
+        long end = CalendarFragmentVM.createEndTime(start);
+        String timezone = "Asia/Shanghai";
+        String location = "我是随便弄的一个地点 " + extraPos;
+        //noinspection ConstantConditions
+        addDisposable(mCalendarVM.insertEvent(context, title, desc, allDay,
+                start, end, timezone, location)
+                .flatMap(insert -> mCalendarVM.queryEventByID(context, ContentUris.parseId(insert)))
+                .doOnError(e -> extraPos += 1)
+                .doOnComplete(() -> extraPos += 1)
+                .subscribe(
+                        next -> {
+                            adapter.addList(next);
+                            LogUtils.w("insert:" + next);
+                        },
+                        Throwable::printStackTrace)
+        );
     }
 
     private void itemLongClick(String info, int adapterPosition) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setMessage(info)
                 .setCancelable(true)
                 .setPositiveButton(
@@ -184,7 +184,8 @@ public class CalendarFragment extends BaseFragment {
                             if (rows > 0) {
                                 ToastHelper.show(Objects.requireNonNull(getContext()),
                                         "delete success.." + rows);
-                                adapter.notifyItemRemoved(adapterPosition);
+//                                adapter.notifyItemRemoved(adapterPosition); // 老是不准确
+                                adapter.notifyDataSetChanged();
                             }
                         }, Throwable::printStackTrace)
         );
