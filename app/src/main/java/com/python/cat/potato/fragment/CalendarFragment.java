@@ -28,6 +28,7 @@ import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
 import com.python.cat.potato.utils.ToastHelper;
+import com.python.cat.potato.viewmodel.CalDeletePop;
 import com.python.cat.potato.viewmodel.CalendarFragmentVM;
 import com.yanzhenjie.permission.AndPermission;
 
@@ -50,11 +51,11 @@ public class CalendarFragment extends BaseFragment {
 
 
     public static final int REQUEST_ADD_EVENTS = 17;
-    private CalendarFragmentVM mCalendarVM;
 
     static long extraPos = 0;
     private CalendarInfoAdapter adapter;
     private RecyclerView showDataRecyclerView;
+    private CalDeletePop deletePop;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -96,7 +97,7 @@ public class CalendarFragment extends BaseFragment {
         adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
         addDisposable(
-                mCalendarVM.queryAllEventsSimple(getActivity())
+                CalendarFragmentVM.queryAllEventsSimple(getActivity())
                         .subscribe(infoList -> {
                             ToastHelper.show(getActivity(), getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
@@ -107,7 +108,7 @@ public class CalendarFragment extends BaseFragment {
             itemLongClick(info, adapterPosition);
         });
         refreshLayout.setOnRefreshListener(() -> addDisposable(
-                mCalendarVM.queryAllEventsSimple(getActivity())
+                CalendarFragmentVM.queryAllEventsSimple(getActivity())
                         .doOnError(e -> ToastHelper.show(getActivity(), "刷新失败..."))
                         .subscribe(infoList -> {
                                     adapter.setCalendarInfoList(infoList);
@@ -123,7 +124,21 @@ public class CalendarFragment extends BaseFragment {
 
         FloatingActionButton fabAdd = view.findViewById(R.id.fragment_calendar_fab_add);
         fabAdd.setOnClickListener(v -> doAddEvent());
+        FloatingActionButton fabDelete = view.findViewById(R.id.fragment_calendar_fab_delete);
+        fabDelete.setOnClickListener(v -> {
+            deletePop = new CalDeletePop(getActivity());
+            deletePop.showAsBottomPopupWindow(v);
+            LogUtils.d("显示全部带自定义属性的日历事件....");
+        });
 
+    }
+
+    @Override
+    public void onDestroy() {
+        if (deletePop != null) {
+            deletePop.hidePopupWindow();
+        }
+        super.onDestroy();
     }
 
     private void doAddEvent() {
@@ -146,14 +161,16 @@ public class CalendarFragment extends BaseFragment {
         String timezone = "Asia/Shanghai";
         String location = "我是随便弄的一个地点 " + extraPos;
         //noinspection ConstantConditions
-        addDisposable(mCalendarVM.insertEvent(context, title, desc, allDay,
+        addDisposable(CalendarFragmentVM.insertEvent(context, title, desc, allDay,
                 start, end, timezone, location)
-                .flatMap(insert -> mCalendarVM.queryEventByID(context, ContentUris.parseId(insert)))
+                .flatMap(insert -> CalendarFragmentVM.queryEventByID(context, ContentUris.parseId(insert)))
                 .doOnError(e -> extraPos += 1)
                 .doOnComplete(() -> extraPos += 1)
                 .subscribe(
                         next -> {
                             adapter.addList(next);
+                            ToastHelper.show(Objects.requireNonNull(getActivity()),
+                                    "添加成功..."+next);
                             LogUtils.w("insert:" + next);
                         },
                         Throwable::printStackTrace)
@@ -178,14 +195,13 @@ public class CalendarFragment extends BaseFragment {
 
     private void doDelete(String info, int adapterPosition) {
         addDisposable(
-                mCalendarVM.deleteByCustom(getContext(), info)
+                CalendarFragmentVM.deleteByCustom(getContext(), info)
                         .subscribe(rows -> {
                             LogUtils.d("after delete: " + rows);
                             if (rows > 0) {
                                 ToastHelper.show(Objects.requireNonNull(getContext()),
                                         "delete success.." + rows);
-//                                adapter.notifyItemRemoved(adapterPosition); // 老是不准确
-                                adapter.notifyDataSetChanged();
+                                adapter.notifyItemRemoved(adapterPosition); // 老是不准确
                             }
                         }, Throwable::printStackTrace)
         );
@@ -207,7 +223,7 @@ public class CalendarFragment extends BaseFragment {
                                 final FragmentActivity activity = getActivity();
                                 LogUtils.v("....");
                                 addDisposable(
-                                        mCalendarVM.queryAllEvents(activity).subscribe(
+                                        CalendarFragmentVM.queryAllEvents(activity).subscribe(
                                                 LogUtils::d, Throwable::printStackTrace)
                                 );
                             })
@@ -240,13 +256,11 @@ public class CalendarFragment extends BaseFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCalendarVM = new CalendarFragmentVM();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mCalendarVM = null;
     }
 
     @Override

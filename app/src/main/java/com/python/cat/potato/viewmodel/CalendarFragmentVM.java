@@ -36,6 +36,8 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class CalendarFragmentVM {
+    private CalendarFragmentVM() {
+    }
 
     private static final String SORT_ORDER = "_id DESC";
 
@@ -44,7 +46,7 @@ public class CalendarFragmentVM {
      * <br/>
      * 查询全部的日历事件，包含<b>主要的</b>事件字段
      */
-    private List<String> _queryCalendarEventsSimple(Context context) throws JSONException {
+    private static List<String> _queryCalendarEventsSimple(Context context) throws JSONException {
         ArrayList<String> infoList = new ArrayList<>();
         if (context == null) {
             throw new RuntimeException("Context == null");
@@ -109,7 +111,7 @@ public class CalendarFragmentVM {
      * <br/>
      * 查询全部的日历事件，包含<b>全部的</b>事件字段
      */
-    private List<String> _queryCalendarEvents(Context context) throws JSONException {
+    private static List<String> _queryCalendarEvents(Context context) throws JSONException {
         ArrayList<String> infoList = new ArrayList<>();
         if (context == null) {
             throw new RuntimeException("Context == null");
@@ -148,7 +150,7 @@ public class CalendarFragmentVM {
     }
 
 
-    private String _queryEventById(Context context, long eventID) throws JSONException {
+    private static String _queryEventById(Context context, long eventID) throws JSONException {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -183,7 +185,8 @@ public class CalendarFragmentVM {
         return obj.toString();
     }
 
-    private List<String> _queryEventsByMessageID(Context context, long messageID) throws JSONException {
+    private static List<String> _queryEventsByMessageID(Context context, long messageID)
+            throws JSONException {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -224,7 +227,75 @@ public class CalendarFragmentVM {
         return infoList;
     }
 
-    public Flowable<List<String>> queryAllEventsSimple(Context context) {
+    private static List<String> _queryEventsHadMessageID(Context context)
+            throws JSONException {
+        if (context == null) {
+            throw new RuntimeException("Context == null");
+        }
+        LogUtils.i("query calendar events...");
+        ContentResolver resolver = context.getContentResolver();
+        if (resolver == null) {
+            throw new RuntimeException("ContentResolver==null");
+        }
+        ArrayList<String> infoList = new ArrayList<>();
+
+        String[] projection = new String[]{
+                Events.CALENDAR_ID,
+                Events.ACCOUNT_TYPE,
+                Events.ACCOUNT_NAME,
+                Events.CALENDAR_DISPLAY_NAME,
+                Events._ID,
+                Events.CUSTOM_APP_PACKAGE,
+                Events.TITLE,
+                Events.DESCRIPTION,
+                Events.DTSTART,
+        };
+        Cursor cursor = resolver
+                .query(Events.CONTENT_URI, projection, null,
+                        null, SORT_ORDER);
+        if (cursor == null) {
+            throw new RuntimeException("Cursor == null");
+        }
+        int columnCount = cursor.getColumnCount();
+        LogUtils.d("columnCount :" + columnCount); // 多少个属性
+        while (cursor.moveToNext()) {
+            JSONObject obj = new JSONObject();
+            for (int i = 0; i < columnCount; i++) {
+                String columnName = cursor.getColumnName(i);
+                String message = cursor.getString(cursor.getColumnIndex(columnName));
+                obj.put(columnName, message);
+            }
+            if (obj.has(Events.CUSTOM_APP_PACKAGE)) {
+                String messageID = obj.getString(Events.CUSTOM_APP_PACKAGE);
+                try {
+                    long message = Long.parseLong(messageID);
+                    if (message != Long.MAX_VALUE) {
+                        // 无意义的判断 ~
+                        infoList.add(formatJson(obj));
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+        }
+        cursor.close();
+        return infoList;
+    }
+
+    public static Flowable<List<String>> queryAllEventsHadMessageID(Context context) {
+        return Flowable.create(
+                (FlowableOnSubscribe<List<String>>) emitter ->
+                {
+                    List<String> stringList = _queryEventsHadMessageID(context);
+                    emitter.onNext(stringList);
+                    emitter.onComplete();
+                },
+                BackpressureStrategy.ERROR)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static Flowable<List<String>> queryAllEventsSimple(Context context) {
         return Flowable.create(
                 (FlowableOnSubscribe<List<String>>) emitter ->
                 {
@@ -237,7 +308,7 @@ public class CalendarFragmentVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<List<String>> queryAllEvents(Context context) {
+    public static Flowable<List<String>> queryAllEvents(Context context) {
         return Flowable.create(
                 (FlowableOnSubscribe<List<String>>) emitter ->
                 {
@@ -251,7 +322,7 @@ public class CalendarFragmentVM {
     }
 
 
-    public Flowable<List<String>> queryEventsByMessageID(Context context, long messageID) {
+    public static Flowable<List<String>> queryEventsByMessageID(Context context, long messageID) {
         return Flowable.create((FlowableOnSubscribe<List<String>>) emitter ->
                 {
                     List<String> stringList = _queryEventsByMessageID(context, messageID);
@@ -263,7 +334,7 @@ public class CalendarFragmentVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<String> queryEventByID(Context context, long eventID) {
+    public static Flowable<String> queryEventByID(Context context, long eventID) {
         return Flowable.create((FlowableOnSubscribe<String>) emitter ->
                 {
 
@@ -347,8 +418,8 @@ public class CalendarFragmentVM {
      * 3. 插入到提醒表 Attendees（可选，如果有提醒的话）
      * </pre>
      */
-    private Uri _insertEvent(Context context, String title, String desc, boolean allDay,
-                             long start, long end, String timezone, String location) {
+    private static Uri _insertEvent(Context context, String title, String desc, boolean allDay,
+                                    long start, long end, String timezone, String location) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -407,9 +478,9 @@ public class CalendarFragmentVM {
         return insert;
     }
 
-    public Flowable<Uri> insertEvent(Context context, String title, String desc,
-                                     boolean allDay, long start, long end,
-                                     String timezone, String location) {
+    public static Flowable<Uri> insertEvent(Context context, String title, String desc,
+                                            boolean allDay, long start, long end,
+                                            String timezone, String location) {
 
         return Flowable.create((FlowableOnSubscribe<Uri>) emitter -> {
             Uri uri = _insertEvent(context, title, desc,
@@ -422,7 +493,7 @@ public class CalendarFragmentVM {
     }
 
 
-    private int _deleteEventByMessageID(Context context, int messageID) {
+    private static int _deleteEventByMessageID(Context context, int messageID) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -436,7 +507,7 @@ public class CalendarFragmentVM {
         return rows;
     }
 
-    private int _deleteEventByID(Context context, int eventID) {
+    private static int _deleteEventByID(Context context, int eventID) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -451,7 +522,7 @@ public class CalendarFragmentVM {
         return rows;
     }
 
-    private int _deleteByCustom(Context context, String where, String[] selectionArgs) {
+    private static int _deleteByCustom(Context context, String where, String[] selectionArgs) {
         if (context == null) {
             throw new RuntimeException("Context == null");
         }
@@ -463,8 +534,8 @@ public class CalendarFragmentVM {
         return rows;
     }
 
-    public Flowable<Integer> deleteByCustom(Context context, String where,
-                                            String[] selectionArgs) {
+    public static Flowable<Integer> deleteByCustom(Context context, String where,
+                                                   String[] selectionArgs) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter -> {
                     int delete = _deleteByCustom(context, where, selectionArgs);
                     emitter.onNext(delete);
@@ -475,7 +546,7 @@ public class CalendarFragmentVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<Integer> deleteByCustom(Context context, String info) {
+    public static Flowable<Integer> deleteByCustom(Context context, String info) {
         return Flowable.create((FlowableOnSubscribe<JSONObject>) emitter -> {
                     JSONObject object = new JSONObject(info);
                     emitter.onNext(object);
@@ -511,7 +582,7 @@ public class CalendarFragmentVM {
     }
 
 
-    public Flowable<Integer> deleteEventByMessageID(Context context, int messageID) {
+    public static Flowable<Integer> deleteEventByMessageID(Context context, int messageID) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
                 {
                     int delete = _deleteEventByMessageID(context, messageID);
@@ -523,7 +594,7 @@ public class CalendarFragmentVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<Integer> deleteEventByID(Context context, int eventID) {
+    public static Flowable<Integer> deleteEventByID(Context context, int eventID) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
                 {
                     int delete = _deleteEventByID(context, eventID);
