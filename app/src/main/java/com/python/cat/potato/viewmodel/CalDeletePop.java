@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,7 @@ public class CalDeletePop {
         mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         // 设置PopupWindow是否能响应外部点击事件
         mPopupWindow.setOutsideTouchable(true); // 外部点击，window 消息
+        mPopupWindow.setFocusable(true); // --> 自动实现了点击返回键消失
 
         // 添加动画
         mPopupWindow.setAnimationStyle(R.style.BottomPopupWindow);
@@ -66,6 +68,7 @@ public class CalDeletePop {
         mPopupWindow.showAtLocation(button.getRootView(), Gravity.BOTTOM
                 | Gravity.CENTER_HORIZONTAL, 0, 0);
         mPopupWindow.setOnDismissListener(this::releaseAll);
+        // https://blog.csdn.net/a521314963/article/details/80225631
         return mPopupWindow;
     }
 
@@ -118,7 +121,7 @@ public class CalDeletePop {
                                 JSONObject object = new JSONObject(info);
                                 String customAppPackage = Events.CUSTOM_APP_PACKAGE;
                                 int messageID = object.getInt(customAppPackage);
-                                doDelete(messageID,adapterPosition);
+                                doDelete(messageID, adapterPosition);
                             } catch (Exception e) {
                                 LogUtils.e(e);
                                 throw new RuntimeException("info has no _id");

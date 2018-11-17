@@ -55,7 +55,6 @@ public class CalendarFragment extends BaseFragment {
 
     static long extraPos = 0;
     private CalendarInfoAdapter adapter;
-    private RecyclerView showDataRecyclerView;
     private CalDeletePop deletePop;
     private ContentObserver calendarObserver;
     private ContentResolver resolver;
@@ -133,7 +132,7 @@ public class CalendarFragment extends BaseFragment {
         // list view header
         tvHeader = view.findViewById(R.id.text_event_count);
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.fragment_calendar_swipe_refresh_layout);
-        showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
+        RecyclerView showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
         showDataRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
