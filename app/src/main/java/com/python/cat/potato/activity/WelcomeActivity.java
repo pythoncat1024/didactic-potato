@@ -9,6 +9,7 @@ import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.global.GlobalInfo;
+import com.python.cat.potato.viewmodel.BaseVM;
 import com.python.cat.potato.viewmodel.WelcomeVM;
 
 import io.reactivex.disposables.Disposable;
@@ -42,8 +43,7 @@ public class WelcomeActivity extends BaseActivity {
     }
 
     private void jump2content() {
-        Intent intent = new Intent(get(), DrawerActivity.class);
-        startActivity(intent);
+        BaseVM.jump2Target(get(), DrawerActivity.class, true);
     }
 
     @Override

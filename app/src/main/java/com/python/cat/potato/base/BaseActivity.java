@@ -66,13 +66,14 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    protected void startActivity(Class clazz) {
-        startActivity(new Intent(get(), clazz));
-    }
-
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+    }
 }
