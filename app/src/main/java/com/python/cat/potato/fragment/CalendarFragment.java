@@ -35,6 +35,7 @@ import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.OnFragmentInteractionListener;
 import com.python.cat.potato.utils.ToastHelper;
+import com.python.cat.potato.viewmodel.BaseVM;
 import com.python.cat.potato.viewmodel.CalDeletePop;
 import com.python.cat.potato.viewmodel.CalendarVM;
 import com.yanzhenjie.permission.AndPermission;
@@ -144,13 +145,7 @@ public class CalendarFragment extends BaseFragment {
                             itemLongClick(info, adapterPosition);
                         });
         adapter.setOnItemClickListener((targetView, info, adapterPosition) -> {
-            long eventID = CalendarVM.parseEventIDFromInfo(info);
-            EventDetailFragment fragment = EventDetailFragment.newInstance(eventID);
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.drawer_content_frame_layout, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+            jump2EventDetail(info);
         });
         refreshLayout.setOnRefreshListener(() -> addDisposable(
                 CalendarVM.queryAllEventsSimple(getActivity())
@@ -175,6 +170,17 @@ public class CalendarFragment extends BaseFragment {
             LogUtils.d("显示全部带自定义属性的日历事件....");
         });
 
+    }
+
+    private void jump2EventDetail(String info) {
+        long eventID = CalendarVM.parseEventIDFromInfo(info);
+        EventDetailFragment fragment = EventDetailFragment.newInstance(eventID);
+        if (getActivity() == null) {
+            throw new RuntimeException("activity == null");
+        }
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        BaseVM.jump2Target(fragmentManager, fragment,
+                R.id.drawer_content_frame_layout, true, true);
     }
 
     private void refreshUI() {

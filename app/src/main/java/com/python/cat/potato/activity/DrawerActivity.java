@@ -18,6 +18,7 @@ import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
 import com.python.cat.potato.fragment.TODOFragment;
+import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -122,11 +123,8 @@ public class DrawerActivity extends BaseActivity
         com.apkfuns.logutils.LogUtils.v("click nav calendar...");
         CalendarFragment fragment = CalendarFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.drawer_content_frame_layout, fragment);
-        // 主界面的 fragment 都不要添加回退栈，子 fragment 再添加
-//        transaction.addToBackStack(null); // 添加到回退栈
-        transaction.commit();
+        BaseVM.jump2Target(fragmentManager, fragment,
+                R.id.drawer_content_frame_layout, false, true);
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
@@ -134,10 +132,8 @@ public class DrawerActivity extends BaseActivity
         com.apkfuns.logutils.LogUtils.v("click nav calendar...");
         TODOFragment fragment = TODOFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.drawer_content_frame_layout, fragment);
-//        transaction.addToBackStack(null); // 添加到回退栈
-        transaction.commit();
+        BaseVM.jump2Target(fragmentManager, fragment,
+                R.id.drawer_content_frame_layout, false, true);
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
