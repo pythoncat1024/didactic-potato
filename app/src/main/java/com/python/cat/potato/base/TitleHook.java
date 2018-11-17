@@ -1,5 +1,5 @@
 package com.python.cat.potato.base;
 
 public interface TitleHook {
-    void setToolbarTitle(String simpleName);
+    void setFragmentTitle(String simpleName);
 }

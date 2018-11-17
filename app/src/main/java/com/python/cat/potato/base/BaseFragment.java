@@ -40,7 +40,7 @@ public abstract class BaseFragment extends Fragment implements HandleDisposable 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (hook != null) {
-            hook.setToolbarTitle(getClass().getSimpleName());
+            hook.setFragmentTitle(getClass().getSimpleName());
         }
 
         LogUtils.d(hook + " , " + getClass().getSimpleName());

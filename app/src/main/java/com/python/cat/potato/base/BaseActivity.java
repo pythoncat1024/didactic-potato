@@ -16,6 +16,10 @@ import io.reactivex.disposables.Disposable;
 public abstract class BaseActivity extends AppCompatActivity
         implements OnFragmentInteractionListener, HandleDisposable {
 
+    static {
+        LogUtils.getLogConfig().configShowBorders(false);
+    }
+
     private CompositeDisposable compositeDisposable;
 
     @Override

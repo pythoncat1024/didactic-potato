@@ -1,6 +1,7 @@
 package com.python.cat.potato.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,35 +11,42 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
+import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
+import com.python.cat.potato.fragment.TODOFragment;
 
 public class DrawerActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         TitleHook {
 
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private NavigationView navigationView;
+    private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_dehaze_black_24dp);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        drawerToggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
 
         // default show calendar
+        navigationView.setCheckedItem(R.id.nav_calendar); // 并不会调用点击的逻辑，只是UI 显示
         showCalendarFragment();
     }
 
@@ -61,13 +69,19 @@ public class DrawerActivity extends BaseActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
+        LogUtils.d("onOptionsItemSelected " + item);
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == android.R.id.home) {
+            LogUtils.w("onOptionsItemSelected home");
+            if (drawerLayout.isDrawerOpen(navigationView)) {
+                drawerLayout.closeDrawer(navigationView, true);
+            } else {
+                drawerLayout.openDrawer(navigationView, true);
+            }
+
+            drawerToggle.syncState();
             return true;
         }
 
@@ -76,7 +90,7 @@ public class DrawerActivity extends BaseActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle bottom_navigation view item clicks here.
         int id = item.getItemId();
 
@@ -91,13 +105,12 @@ public class DrawerActivity extends BaseActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setTitle("send..");
-//            setSupportActionBar(toolbar);
 
         } else if (id == R.id.nav_calendar) {
             // calendar
             showCalendarFragment();
+        } else if (id == R.id.nav_todo) {
+            showTODOFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -113,10 +126,22 @@ public class DrawerActivity extends BaseActivity
         transaction.replace(R.id.drawer_content_frame_layout, fragment);
 //            transaction.addToBackStack(null);
         transaction.commit();
+//        toolbar.setTitle(fragment.getClass().getName());
+    }
+
+    private void showTODOFragment() {
+        com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+        TODOFragment fragment = TODOFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.drawer_content_frame_layout, fragment);
+//            transaction.addToBackStack(null);
+        transaction.commit();
+        toolbar.setTitle(fragment.getClass().getName());
     }
 
     @Override
-    public void setToolbarTitle(String simpleName) {
+    public void setFragmentTitle(String simpleName) {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(simpleName);
         setSupportActionBar(toolbar);

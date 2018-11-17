@@ -20,6 +20,13 @@ public class TODOFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static TODOFragment newInstance() {
+        Bundle args = new Bundle();
+        TODOFragment fragment = new TODOFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
