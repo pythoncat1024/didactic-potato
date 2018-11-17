@@ -126,7 +126,7 @@ public class DrawerActivity extends BaseActivity
         transaction.replace(R.id.drawer_content_frame_layout, fragment);
 //            transaction.addToBackStack(null);
         transaction.commit();
-//        toolbar.setTitle(fragment.getClass().getName());
+        toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
     private void showTODOFragment() {
@@ -137,7 +137,7 @@ public class DrawerActivity extends BaseActivity
         transaction.replace(R.id.drawer_content_frame_layout, fragment);
 //            transaction.addToBackStack(null);
         transaction.commit();
-        toolbar.setTitle(fragment.getClass().getName());
+        toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
     @Override

@@ -42,7 +42,6 @@
             android:layout_margin="10dp"
             android:text="@string/update_calendar_event" />
 
-
     </LinearLayout>
 
     <android.support.design.widget.CoordinatorLayout
@@ -60,7 +59,7 @@
             <TextView
                 android:id="@+id/text_event_count"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:gravity="center_vertical"
                 android:minHeight="30dp"
                 android:paddingStart="18dp"
