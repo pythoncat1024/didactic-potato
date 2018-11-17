@@ -124,7 +124,8 @@ public class DrawerActivity extends BaseActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.drawer_content_frame_layout, fragment);
-//            transaction.addToBackStack(null);
+        // 主界面的 fragment 都不要添加回退栈，子 fragment 再添加
+//        transaction.addToBackStack(null); // 添加到回退栈
         transaction.commit();
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }
@@ -135,7 +136,7 @@ public class DrawerActivity extends BaseActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.drawer_content_frame_layout, fragment);
-//            transaction.addToBackStack(null);
+//        transaction.addToBackStack(null); // 添加到回退栈
         transaction.commit();
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }

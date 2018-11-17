@@ -24,7 +24,8 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
 
     private Context mContext;
 
-    private OnItemLongClickListener mItemLongClickListener;
+    private OnItemLongClickListener<String> mItemLongClickListener;
+    private OnItemClickListener<String> mItemClickListener;
 
     public CalendarInfoAdapter(@NonNull Context context) {
         this.mContext = context;
@@ -66,6 +67,11 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
             }
             return true;
         });
+        vh.itemView.setOnClickListener(v -> {
+            if (mItemClickListener != null) {
+                mItemClickListener.click(vh.itemView, info, position);
+            }
+        });
 
         try {
             String jsonWithTime = CalendarVM.formatJsonWithTime(info);
@@ -92,13 +98,21 @@ public class CalendarInfoAdapter extends RecyclerView.Adapter<CalendarInfoAdapte
     }
 
 
-    public interface OnItemLongClickListener {
+    public interface OnItemLongClickListener<T> {
 
-        void click(View targetView, String info, int adapterPosition);
+        void click(View targetView, T info, int adapterPosition);
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.mItemLongClickListener = listener;
+    }
+
+    public interface OnItemClickListener<T> {
+        void click(View targetView, T info, int adapterPosition);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<String> listener) {
+        this.mItemClickListener = listener;
     }
 
 

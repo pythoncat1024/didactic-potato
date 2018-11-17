@@ -18,6 +18,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -136,9 +138,19 @@ public class CalendarFragment extends BaseFragment {
         adapter = new CalendarInfoAdapter(getActivity());
         showDataRecyclerView.setAdapter(adapter);
         refreshUI();
-        adapter.setOnItemLongClickListener((targetView, info, adapterPosition) -> {
-            // 删除事件
-            itemLongClick(info, adapterPosition);
+        adapter.setOnItemLongClickListener(
+                (CalendarInfoAdapter.OnItemLongClickListener<String>)
+                        (targetView, info, adapterPosition) -> {
+                            // 删除事件
+                            itemLongClick(info, adapterPosition);
+                        });
+        adapter.setOnItemClickListener((targetView, info, adapterPosition) -> {
+            EventDetailFragment fragment = EventDetailFragment.newInstance(info);
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.drawer_content_frame_layout, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         });
         refreshLayout.setOnRefreshListener(() -> addDisposable(
                 CalendarVM.queryAllEventsSimple(getActivity())

@@ -27,6 +27,9 @@ import java.util.Objects;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
+/**
+ * 删除弹出的对话框
+ */
 public class CalDeletePop {
 
     private Context mContext;
@@ -82,10 +85,6 @@ public class CalDeletePop {
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
-        adapter.setOnItemLongClickListener((targetView, info, adapterPosition) -> {
-            // 删除事件
-            itemLongClick(info, adapterPosition);
-        });
 
         refreshLayout.setOnRefreshListener(() -> addDisposable(
                 CalendarVM.queryAllEventsHadMessageID(mContext)
