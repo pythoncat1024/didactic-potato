@@ -9,4 +9,5 @@
     <color name="black">@android:color/black</color>
     <color name="gray">#eee</color>
     <color name="line_divider">#eee</color>
+    <color name="blackTransparent">#a000</color>
 </resources>

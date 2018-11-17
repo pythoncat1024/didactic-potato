@@ -56,7 +56,9 @@ public class CalDeletePop {
         mPopupWindow.setHeight(FrameLayout.LayoutParams.WRAP_CONTENT);
         mPopupWindow.setContentView(va);
         // 设置PopupWindow的背景
-        mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        int color = mContext.getResources().getColor(R.color.blackTransparent);
+        ColorDrawable background = new ColorDrawable(color);
+        mPopupWindow.setBackgroundDrawable(background);
         // 设置PopupWindow是否能响应外部点击事件
         mPopupWindow.setOutsideTouchable(true); // 外部点击，window 消息
         mPopupWindow.setFocusable(true); // --> 自动实现了点击返回键消失
@@ -84,7 +86,7 @@ public class CalDeletePop {
         addDisposable(
                 CalendarVM.queryAllEventsHadMessageID(mContext)
                         .subscribe(infoList -> {
-                            ToastHelper.show(mContext, mContext.getString(R.string.events_count, infoList.size()));
+//                            ToastHelper.show(mContext, mContext.getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
@@ -92,10 +94,11 @@ public class CalDeletePop {
         refreshLayout.setOnRefreshListener(() -> addDisposable(
                 CalendarVM.queryAllEventsHadMessageID(mContext)
                         .doOnError(e -> ToastHelper.show(mContext, "刷新失败..."))
-                        .subscribe(infoList -> {
+                        .subscribe(
+                                infoList -> {
                                     adapter.setCalendarInfoList(infoList);
-                                    ToastHelper.show(mContext, "刷新成功..."
-                                            + mContext.getString(R.string.events_count, infoList.size()));
+//                                    ToastHelper.show(mContext, "刷新成功..."
+//                                            + mContext.getString(R.string.events_count, infoList.size()));
                                 },
                                 e -> {
                                     LogUtils.e(e);

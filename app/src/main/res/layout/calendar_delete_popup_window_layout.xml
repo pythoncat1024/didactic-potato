@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="20dp">
 
     <LinearLayout
         android:id="@+id/popup_calendar_show_data_layout"
@@ -16,6 +17,7 @@
             android:layout_height="@dimen/item_height"
             android:gravity="center"
             android:text="@string/cal_delete_popup_window_title"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
 
