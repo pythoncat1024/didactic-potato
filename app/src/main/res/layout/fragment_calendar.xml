@@ -51,18 +51,53 @@
         android:layout_height="match_parent"
         android:visibility="visible">
 
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/fragment_calendar_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <TextView
+                android:id="@+id/text_event_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="30dp"
+                android:paddingStart="18dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/events_count"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_scrollFlags="scroll|enterAlways"
+                tools:text="@string/event_id" />
+            <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--app:popupTheme="@style/AppTheme.PopupOverlay"-->
+            <!--app:cardCornerRadius="4dp"-->
+            <!--app:cardElevation="4dp"-->
+            <!--android:background="#f00"-->
+            <!--app:cardPreventCornerOverlap="false"-->
+            <!--app:cardUseCompatPadding="true"-->
+            <!--app:layout_scrollFlags="scroll|enterAlways">-->
+            <!--</android.support.v7.widget.CardView>-->
+        </android.support.design.widget.AppBarLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/fragment_calendar_swipe_refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/fragment_calendar_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fadeScrollbars="true"
-                android:scrollbars="vertical"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                android:scrollbars="vertical">
 
             </android.support.v7.widget.RecyclerView>
 

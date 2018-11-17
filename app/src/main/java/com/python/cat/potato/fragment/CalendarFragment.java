@@ -25,6 +25,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
@@ -56,6 +57,8 @@ public class CalendarFragment extends BaseFragment {
     private CalDeletePop deletePop;
     private ContentObserver calendarObserver;
     private ContentResolver resolver;
+    private TextView tvHeader;
+
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -88,18 +91,15 @@ public class CalendarFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setEventsObserver();
+        return inflater.inflate(R.layout.fragment_calendar, container, false);
+    }
+
+    private void setEventsObserver() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-
             resolver = activity.getContentResolver();
-
             calendarObserver = new ContentObserver(mMainHandler) {
-//                @Override
-//                public void onChange(boolean selfChange) {
-//                    super.onChange(selfChange);
-//                    LogUtils.d(selfChange);
-//                }
-
                 @Override
                 public void onChange(boolean selfChange, Uri uri) {
                     super.onChange(selfChange, uri);
@@ -111,7 +111,6 @@ public class CalendarFragment extends BaseFragment {
                 }
             };
         }
-        return inflater.inflate(R.layout.fragment_calendar, container, false);
     }
 
     @Override
@@ -129,6 +128,8 @@ public class CalendarFragment extends BaseFragment {
         }
         ViewGroup showDataLayout = view.findViewById(R.id.fragment_calendar_show_data_layout);
         showDataLayout.setVisibility(View.VISIBLE);
+        // list view header
+        tvHeader = view.findViewById(R.id.text_event_count);
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.fragment_calendar_swipe_refresh_layout);
         showDataRecyclerView = view.findViewById(R.id.fragment_calendar_recycler_view);
         showDataRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -144,8 +145,7 @@ public class CalendarFragment extends BaseFragment {
                         .doOnError(e -> ToastHelper.show(getActivity(), "刷新失败..."))
                         .subscribe(infoList -> {
                                     adapter.setCalendarInfoList(infoList);
-                                    ToastHelper.show(getActivity(), "刷新成功..."
-                                            + getString(R.string.events_count, infoList.size()));
+                                    tvHeader.setText(getString(R.string.events_count, infoList.size()));
                                 },
                                 e -> {
                                     LogUtils.e(e);
@@ -169,7 +169,7 @@ public class CalendarFragment extends BaseFragment {
         addDisposable(
                 CalendarVM.queryAllEventsSimple(getActivity())
                         .subscribe(infoList -> {
-                            ToastHelper.show(getActivity(), getString(R.string.events_count, infoList.size()));
+                            tvHeader.setText(getString(R.string.events_count, infoList.size()));
                             adapter.setCalendarInfoList(infoList);
                         }, Throwable::printStackTrace)
         );
