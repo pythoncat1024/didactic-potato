@@ -144,7 +144,8 @@ public class CalendarFragment extends BaseFragment {
                             itemLongClick(info, adapterPosition);
                         });
         adapter.setOnItemClickListener((targetView, info, adapterPosition) -> {
-            EventDetailFragment fragment = EventDetailFragment.newInstance(info);
+            long eventID = CalendarVM.parseEventIDFromInfo(info);
+            EventDetailFragment fragment = EventDetailFragment.newInstance(eventID);
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.drawer_content_frame_layout, fragment);

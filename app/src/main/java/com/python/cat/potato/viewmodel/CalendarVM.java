@@ -776,4 +776,14 @@ public class CalendarVM {
         line.append("\n").append("}");
         return line.toString();
     }
+
+    public static long parseEventIDFromInfo(String info) {
+        try {
+            JSONObject json = new JSONObject(info);
+            return json.getLong(Events._ID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 }
