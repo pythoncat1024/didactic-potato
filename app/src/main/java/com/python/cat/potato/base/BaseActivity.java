@@ -1,7 +1,6 @@
 package com.python.cat.potato.base;
 
 import android.Manifest;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,11 +13,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public abstract class BaseActivity extends AppCompatActivity
-        implements OnFragmentInteractionListener, HandleDisposable {
-
-    static {
-        LogUtils.getLogConfig().configShowBorders(false);
-    }
+        implements HandleDisposable {
 
     private CompositeDisposable compositeDisposable;
 
@@ -67,13 +62,8 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

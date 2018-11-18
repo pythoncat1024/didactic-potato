@@ -19,7 +19,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,7 +32,6 @@ import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseFragment;
-import com.python.cat.potato.base.OnFragmentInteractionListener;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.BaseVM;
 import com.python.cat.potato.viewmodel.CalDeletePop;
@@ -45,8 +43,6 @@ import java.util.Objects;
 /**
  * calendar
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
 public class CalendarFragment extends BaseFragment {

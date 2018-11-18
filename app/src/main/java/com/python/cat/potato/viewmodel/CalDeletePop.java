@@ -1,7 +1,6 @@
 package com.python.cat.potato.viewmodel;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.provider.CalendarContract.Events;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +43,7 @@ public class CalDeletePop {
 
     private PopupWindow mPopupWindow;
 
+    @SuppressWarnings("UnusedReturnValue")
     public PopupWindow showAsBottomPopupWindow(View button) {
         compositeDisposable = new CompositeDisposable();
 

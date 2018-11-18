@@ -129,8 +129,7 @@ public class CalendarVM {
         }
         int columnCount = cursor.getColumnCount();
         LogUtils.d("columnCount :" + columnCount);// 多少个属性
-        int row = 0; // 第几行
-//        line.append("all info: [\n");
+        //        line.append("all info: [\n");
         while (cursor.moveToNext()) {
             JSONObject jObj = new JSONObject();
             for (int i = 0; i < columnCount; i++) {
@@ -143,7 +142,6 @@ public class CalendarVM {
                 jObj.put(columnName, message);
             }
             infoList.add(formatJson(jObj));
-            row += 1;
         }
         cursor.close();
         return infoList;
@@ -282,6 +280,7 @@ public class CalendarVM {
         return infoList;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static Flowable<List<String>> queryAllEventsHadMessageID(Context context) {
         return Flowable.create(
                 (FlowableOnSubscribe<List<String>>) emitter ->
@@ -322,6 +321,7 @@ public class CalendarVM {
     }
 
 
+    @SuppressWarnings("unused")
     public static Flowable<List<String>> queryEventsByMessageID(Context context, long messageID) {
         return Flowable.create((FlowableOnSubscribe<List<String>>) emitter ->
                 {
@@ -350,23 +350,22 @@ public class CalendarVM {
     /**
      * from: https://blog.csdn.net/mysimplelove/article/details/81018641
      */
+    @SuppressWarnings("unused")
     private static long _checkCalendarAccount(Context context) {
-        Cursor userCursor = context.getContentResolver().query(Calendars.CONTENT_URI,
-                null, null, null, null);
-        try {
+        try (
+                Cursor userCursor = context.getContentResolver()
+                        .query(Calendars.CONTENT_URI,
+                                null, null, null, null)
+        ) {
             if (userCursor == null) { // 查询返回空值
                 return -1;
             }
             int count = userCursor.getCount();
             if (count > 0) { // 存在现有账户，取第一个账户的id返回
                 userCursor.moveToFirst();
-                return userCursor.getInt(userCursor.getColumnIndex(CalendarContract.Calendars._ID));
+                return userCursor.getInt(userCursor.getColumnIndex(Calendars._ID));
             } else {
                 return -1;
-            }
-        } finally {
-            if (userCursor != null) {
-                userCursor.close();
             }
         }
     }
@@ -385,9 +384,11 @@ public class CalendarVM {
         String[] selectionArgs = new String[]{
                 calendarName, accountName, accountType
         };
-        Cursor cursor = context.getContentResolver().query(Calendars.CONTENT_URI,
-                projection, selection, selectionArgs, null);
-        try {
+        try (
+                Cursor cursor = context.getContentResolver()
+                        .query(Calendars.CONTENT_URI, projection,
+                                selection, selectionArgs, null)
+        ) {
             if (cursor == null) { // 查询返回空值
                 return -1;
             }
@@ -409,17 +410,15 @@ public class CalendarVM {
                 }
             }
             return -1;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
+    @SuppressWarnings("unused")
     public static Flowable<Long> checkAccount(Context context, String calendarName,
                                               String accountName, String accountType) {
         return Flowable.create((FlowableOnSubscribe<Long>) emitter -> {
-            emitter.onNext(_checkCalendarAccount(context, calendarName, accountName, accountType));
+            long value = _checkCalendarAccount(context, calendarName, accountName, accountType);
+            emitter.onNext(value);
             emitter.onComplete();
         }, BackpressureStrategy.ERROR)
                 .subscribeOn(Schedulers.computation())
@@ -457,10 +456,10 @@ public class CalendarVM {
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE,
                         accountType)
                 .build();
-        Uri result = context.getContentResolver().insert(calendarUri, value);
-        return result;
+        return context.getContentResolver().insert(calendarUri, value);
     }
 
+    @SuppressWarnings("unused")
     public static Flowable<Uri> addCalendarAccount(Context context,
                                                    String calendarName, String accountName,
                                                    String accountType, String displayName) {
@@ -579,8 +578,7 @@ public class CalendarVM {
         }
         String where = String.format(Locale.ENGLISH, "%s = ?", Events.CUSTOM_APP_PACKAGE);
         String[] selectionArgs = new String[]{String.valueOf(messageID)};
-        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
-        return rows;
+        return cr.delete(Events.CONTENT_URI, where, selectionArgs);
     }
 
     private static int _deleteEventByID(Context context, int eventID) {
@@ -594,8 +592,7 @@ public class CalendarVM {
 //      Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventID);
         String where = String.format(Locale.ENGLISH, "%s = ?", Events._ID);
         String[] selectionArgs = new String[]{String.valueOf(eventID)};
-        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
-        return rows;
+        return cr.delete(Events.CONTENT_URI, where, selectionArgs);
     }
 
     private static int _deleteByCustom(Context context, String where, String[] selectionArgs) {
@@ -606,10 +603,10 @@ public class CalendarVM {
         if (cr == null) {
             throw new RuntimeException("ContentResolver == null");
         }
-        int rows = cr.delete(Events.CONTENT_URI, where, selectionArgs);
-        return rows;
+        return cr.delete(Events.CONTENT_URI, where, selectionArgs);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static Flowable<Integer> deleteByCustom(Context context, String where,
                                                    String[] selectionArgs) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter -> {
@@ -658,6 +655,7 @@ public class CalendarVM {
     }
 
 
+    @SuppressWarnings("WeakerAccess")
     public static Flowable<Integer> deleteEventByMessageID(Context context, int messageID) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
                 {
@@ -670,6 +668,7 @@ public class CalendarVM {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    @SuppressWarnings("unused")
     public static Flowable<Integer> deleteEventByID(Context context, int eventID) {
         return Flowable.create((FlowableOnSubscribe<Integer>) emitter ->
                 {
@@ -702,10 +701,11 @@ public class CalendarVM {
         return instance.getTimeInMillis();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static String formatTime(long timeInMillis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
-        String formatTime = String.format(Locale.getDefault(),
+        return String.format(Locale.getDefault(),
                 "%04d%02d%02d %02d:%02d:%02d.%03d",
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH) + 1,
@@ -715,12 +715,12 @@ public class CalendarVM {
                 calendar.get(Calendar.SECOND),
                 calendar.get(Calendar.MILLISECOND)
         );
-        return formatTime;
     }
 
     /**
      * 将 json 换行显示
      */
+    @SuppressWarnings("unused")
     private static String formatJson(String json) throws JSONException {
         JSONObject object = new JSONObject(json);
         return formatJson(object);

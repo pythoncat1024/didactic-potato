@@ -1,7 +1,5 @@
 package com.python.cat.potato.domain;
 
-import java.util.Objects;
-
 public class CalendarInfo {
 
     // from: https://blog.csdn.net/wenzhi20102321/article/details/80644833
