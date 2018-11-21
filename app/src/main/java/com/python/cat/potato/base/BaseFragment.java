@@ -14,36 +14,11 @@ import io.reactivex.disposables.Disposable;
 
 public abstract class BaseFragment extends Fragment implements HandleDisposable {
 
-    private TitleHook hook;
     private CompositeDisposable compositeDisposable;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (context instanceof TitleHook) {
-            hook = (TitleHook) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " current activity must implement "
-                    + TitleHook.class.getSimpleName());
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        hook = null;
-    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (hook != null) {
-            hook.setFragmentTitle(getClass().getSimpleName());
-        }
-
-        LogUtils.d(hook + " , " + getClass().getSimpleName());
     }
 
 

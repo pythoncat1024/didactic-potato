@@ -20,8 +20,7 @@ import com.python.cat.potato.fragment.TODOFragment;
 import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        TitleHook {
+        implements NavigationView.OnNavigationItemSelectedListener,TitleHook {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -46,8 +45,8 @@ public class DrawerActivity extends BaseActivity
         drawerLayout.addDrawerListener(drawerToggle);
 
         // default show calendar
-        navigationView.setCheckedItem(R.id.nav_calendar); // 并不会调用点击的逻辑，只是UI 显示
         showCalendarFragment();
+        navigationView.setCheckedItem(R.id.nav_calendar); // 并不会调用点击的逻辑，只是UI 显示
     }
 
     @Override
@@ -71,9 +70,7 @@ public class DrawerActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         LogUtils.d("onOptionsItemSelected " + item);
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home) {
+        if (id == android.R.id.home) {
             LogUtils.w("onOptionsItemSelected home");
             if (drawerLayout.isDrawerOpen(navigationView)) {
                 drawerLayout.closeDrawer(navigationView, true);
@@ -123,7 +120,7 @@ public class DrawerActivity extends BaseActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         BaseVM.jump2Target(fragmentManager, fragment,
                 R.id.drawer_content_frame_layout, false, true);
-        toolbar.setTitle(fragment.getClass().getSimpleName());
+//        toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
     private void showTODOFragment() {
@@ -137,9 +134,6 @@ public class DrawerActivity extends BaseActivity
 
     @Override
     public void setFragmentTitle(String simpleName) {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(simpleName);
-        setSupportActionBar(toolbar);
     }
-
 }

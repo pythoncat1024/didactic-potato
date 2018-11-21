@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,7 @@ import com.python.cat.potato.viewmodel.CalendarVM;
 public class EventDetailFragment extends BaseFragment {
     private static final String KEY_EVENT_INFO = "key_event_info";
 
-    // TODO: Rename and change types of parameters
     private long eventInfo;
-
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -56,6 +55,7 @@ public class EventDetailFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initTitle(view);
         TextView tvContent = view.findViewById(R.id.fragment_event_detail_text_tv);
 //        tvContent.setText(eventInfo);
         addDisposable(CalendarVM.queryEventByID(getContext(), eventInfo)
@@ -63,5 +63,17 @@ public class EventDetailFragment extends BaseFragment {
                     String jsonWithTime = CalendarVM.formatJsonWithTime(info);
                     tvContent.setText(jsonWithTime);
                 }, Throwable::printStackTrace));
+    }
+
+    private void initTitle(View view) {
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setNavigationOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().onBackPressed();
+            }
+        });
+        toolbar.setTitle(getClass().getSimpleName());
+
     }
 }

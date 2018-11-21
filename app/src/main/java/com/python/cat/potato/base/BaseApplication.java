@@ -27,8 +27,10 @@ public class BaseApplication extends Application {
         }
         LogUtils.getLogConfig()
                 .configShowBorders(false)
-        .configAllowLog(GlobalInfo.ALLOW_LOG)
+                .configAllowLog(GlobalInfo.ALLOW_LOG)
         ;
+
+        Holder.app = this;
     }
 
 
@@ -37,5 +39,9 @@ public class BaseApplication extends Application {
         File parent = Environment.getExternalStoragePublicDirectory(type);
         File selfDir = new File(parent, BuildConfig.APPLICATION_ID);
         return selfDir.getAbsolutePath();
+    }
+
+    public static class Holder {
+        public static Application app;
     }
 }

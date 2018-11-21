@@ -30,8 +30,12 @@ import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
+import com.python.cat.potato.activity.EventInfoActivity;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
+import com.python.cat.potato.base.BaseApplication;
 import com.python.cat.potato.base.BaseFragment;
+import com.python.cat.potato.base.TitleHook;
+import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.BaseVM;
 import com.python.cat.potato.viewmodel.CalDeletePop;
@@ -50,7 +54,8 @@ public class CalendarFragment extends BaseFragment {
 
     public static final int REQUEST_ADD_EVENTS = 17;
 
-    static long extraPos = 0;
+    private TitleHook hook;
+    static long extraPos = 0; // 给系统日历的
     private CalendarInfoAdapter adapter;
     private CalDeletePop deletePop;
     private ContentObserver calendarObserver;
@@ -78,6 +83,38 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof TitleHook) {
+            hook = (TitleHook) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        hook = null;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        LogUtils.w("..." + isVisibleToUser);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showCurrentTitle();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (calendarObserver != null && resolver != null) {
@@ -92,6 +129,7 @@ public class CalendarFragment extends BaseFragment {
         setEventsObserver();
         return inflater.inflate(R.layout.fragment_calendar, container, false);
     }
+
 
     private void setEventsObserver() {
         FragmentActivity activity = getActivity();
@@ -114,10 +152,16 @@ public class CalendarFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LogUtils.d(view + " , " + savedInstanceState);
-
+        LogUtils.d(view + " , " + savedInstanceState + " ### " + hook);
         initOperationLayout(view);
         initShowDataLayout(view);
+    }
+
+    private void showCurrentTitle() {
+        if (hook != null) {
+            hook.setFragmentTitle(getClass().getSimpleName());
+            LogUtils.d("setFragmentTitle" + getClass().getSimpleName());
+        }
     }
 
     private void initShowDataLayout(View view) {
@@ -141,7 +185,7 @@ public class CalendarFragment extends BaseFragment {
                             itemLongClick(info, adapterPosition);
                         });
         adapter.setOnItemClickListener((targetView, info, adapterPosition) -> {
-            jump2EventDetail(info);
+            itemClick(info);
         });
         refreshLayout.setOnRefreshListener(() -> addDisposable(
                 CalendarVM.queryAllEventsSimple(getActivity())
@@ -168,15 +212,19 @@ public class CalendarFragment extends BaseFragment {
 
     }
 
+    private void itemClick(String info) {
+        jump2EventDetail(info);
+    }
+
     private void jump2EventDetail(String info) {
-        long eventID = CalendarVM.parseEventIDFromInfo(info);
-        EventDetailFragment fragment = EventDetailFragment.newInstance(eventID);
         if (getActivity() == null) {
-            throw new RuntimeException("activity == null");
+            ToastHelper.show(BaseApplication.Holder.app, "activity == null!");
+            return;
         }
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        BaseVM.jump2Target(fragmentManager, fragment,
-                R.id.drawer_content_frame_layout, true, true);
+        long eventID = CalendarVM.parseEventIDFromInfo(info);
+        Bundle bundle = new Bundle();
+        bundle.putLong(GlobalInfo.IntentKey.KEY_EVENT_ID, eventID);
+        BaseVM.jump2Target(getActivity(), EventInfoActivity.class, bundle, true);
     }
 
     private void refreshUI() {
@@ -311,16 +359,6 @@ public class CalendarFragment extends BaseFragment {
                     LogUtils.v("");
                     LogUtils.v("update..");
                 });
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     @Override
