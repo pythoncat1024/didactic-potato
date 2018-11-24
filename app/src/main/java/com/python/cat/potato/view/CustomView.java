@@ -5,18 +5,25 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
+import android.util.Pair;
 import android.view.View;
+
+import com.apkfuns.logutils.LogUtils;
+
+import java.util.Locale;
 
 public class CustomView extends View {
 
-    private Paint paint;
+    private Paint linePaint;
     private Path path;
+    private int centerX;
+    private int centerY;
+
+    private int count = 6; // 6层
+    private int slideSize = 6; // 6边形
+    private int maxRadius; // 最大半径
 
     public CustomView(Context context) {
         this(context, null);
@@ -36,28 +43,68 @@ public class CustomView extends View {
         init();
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        centerX = w / 2;
+        centerY = h / 2;
+        path.moveTo(centerX, centerY);
+        maxRadius = Math.round(Math.min(centerX, centerY) * 0.9f);
+
+        String format = "center:(%d,%d) ### maxRadius = %d";
+        LogUtils.i(String.format(Locale.ENGLISH, format, centerX, centerY, maxRadius));
+        path.reset();
+        path.rewind();
+
+        postInvalidate();
+    }
+
     private void init() {
-        paint = new Paint();
-        paint.setColor(Color.GRAY);
-        paint.setStrokeWidth(5);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(50);
+        linePaint = new Paint();
+        linePaint.setColor(Color.GRAY);
+        linePaint.setStrokeWidth(1);
+        linePaint.setStyle(Paint.Style.STROKE);
         path = new Path();
-        RectF rectF = new RectF(100, 100, 700, 700);
-        path.addRect(rectF,Path.Direction.CW);
-        RectF oval = new RectF(400, 400, 1000, 1000);
-//        path.addArc(oval,0,360); // 强制 CW，不能指定！
-        path.addCircle(700,700,300,Path.Direction.CW);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        paint.setStyle(Paint.Style.FILL);
-        //  [前提，方向相同]都是 CW,或都是 CCW
-//        path.setFillType(Path.FillType.WINDING); // 理论上是并集
-        path.setFillType(Path.FillType.EVEN_ODD); // XOR
-        canvas.drawPath(path,paint);
+        linePaint.setColor(Color.RED);
+        linePaint.setStrokeWidth(4);
 
+        canvas.drawPoint(centerX, centerY, linePaint); // ok
+        int radius = maxRadius; // 每层的半径
+
+        for (float angle = 0; angle < 360; angle += 360 / count) {
+            float x = centerX + (float) (radius * cos(angle));
+            float y = centerY + (float) (radius * sin(angle));
+//            canvas.drawPoint(x, y, linePaint);
+            if (angle == 0) {
+                path.moveTo(x, y);
+            } else {
+                path.lineTo(x, y);
+            }
+        }
+        path.close();
+        canvas.drawPath(path,linePaint);
+    }
+
+    /**
+     * @param angle 0-360
+     * @return [-1,1]
+     */
+    private double sin(double angle) {
+        angle = angle * Math.PI / 180;
+        return Math.sin(angle);
+    }
+
+    /**
+     * @param angle 0-360
+     * @return [-1,1]
+     */
+    private double cos(double angle) {
+        angle = angle * Math.PI / 180;
+        return Math.cos(angle);
     }
 }
