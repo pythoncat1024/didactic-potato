@@ -46,8 +46,12 @@ public class DrawerActivity extends BaseActivity
         drawerLayout.addDrawerListener(drawerToggle);
 
         // default show calendar
-        showCalendarFragment();
-        navigationView.setCheckedItem(R.id.nav_calendar); // 并不会调用点击的逻辑，只是UI 显示
+        showDefaultFragment(R.id.nav_view);
+    }
+
+    private void showDefaultFragment(int navID) {
+        navigationView.setCheckedItem(navID); // 并不会调用点击的逻辑，只是UI 显示
+        navFragment(navID);
     }
 
     @Override
@@ -90,7 +94,11 @@ public class DrawerActivity extends BaseActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle bottom_navigation view item clicks here.
         int id = item.getItemId();
+        navFragment(id);
+        return true;
+    }
 
+    private void navFragment(int id) {
         if (id == R.id.nav_view) {
             // Handle the camera action
             showViewFragment();
@@ -113,7 +121,6 @@ public class DrawerActivity extends BaseActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private void showViewFragment() {
