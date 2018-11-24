@@ -35,7 +35,9 @@
         <activity
             android:name=".activity.EventEditActivity"
             android:label="@string/add_calendar_event" />
-        <activity android:name=".activity.EventInfoActivity"></activity>
+        <activity
+            android:name=".activity.EventInfoActivity"
+            android:label="@string/text_calendar_event_info" />
     </application>
 
 </manifest>

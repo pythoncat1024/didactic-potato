@@ -29,8 +29,10 @@ public abstract class BaseActivity extends AppCompatActivity
 //        compositeDisposable.dispose();
 
         AndPermission.with(getApplicationContext())
-                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                .permission(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                )
                 .onDenied(permissions -> {
                     LogUtils.e(permissions);
                     throw new RuntimeException("denied: " + permissions);

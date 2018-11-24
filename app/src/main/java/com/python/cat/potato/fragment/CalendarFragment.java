@@ -18,7 +18,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +41,7 @@ import com.python.cat.potato.viewmodel.CalDeletePop;
 import com.python.cat.potato.viewmodel.CalendarVM;
 import com.yanzhenjie.permission.AndPermission;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -126,6 +126,16 @@ public class CalendarFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        AndPermission.with(this)
+                .permission(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR)
+                .onGranted(grant -> {
+                    LogUtils.v("permissions granted! :" + grant);
+                })
+                .onDenied(permissions -> {
+                    LogUtils.e("permission denied:" + permissions);
+                    throw new RuntimeException(Arrays.toString(permissions.toArray()));
+                })
+                .start();
         setEventsObserver();
         return inflater.inflate(R.layout.fragment_calendar, container, false);
     }
