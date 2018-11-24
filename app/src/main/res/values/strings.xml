@@ -51,4 +51,11 @@
     <string name="positive_button_text">确认</string>
     <string name="negative_button_text">取消</string>
     <string name="cal_delete_popup_window_title">我是删除弹窗的标题</string>
+    <string name="calendar">Calendar</string>
+    <string name="view">View</string>
+    <string name="gallery">Gallery</string>
+    <string name="slideshow">Slideshow</string>
+    <string name="todo">TODO</string>
+    <string name="tools">Tools</string>
+    <string name="communicate">Communicate</string>
 </resources>

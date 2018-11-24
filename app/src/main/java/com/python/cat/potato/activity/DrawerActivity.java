@@ -17,6 +17,7 @@ import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
 import com.python.cat.potato.fragment.TODOFragment;
+import com.python.cat.potato.fragment.ViewFragment;
 import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
@@ -90,8 +91,9 @@ public class DrawerActivity extends BaseActivity
         // Handle bottom_navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_view) {
             // Handle the camera action
+            showViewFragment();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -112,6 +114,15 @@ public class DrawerActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showViewFragment() {
+        com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+        ViewFragment fragment = ViewFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        BaseVM.jump2Target(fragmentManager, fragment,
+                R.id.drawer_content_frame_layout, false, true);
+//        toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
     private void showCalendarFragment() {

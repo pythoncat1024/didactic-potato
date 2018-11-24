@@ -32,8 +32,7 @@ import com.python.cat.potato.R;
 import com.python.cat.potato.activity.EventInfoActivity;
 import com.python.cat.potato.adapter.CalendarInfoAdapter;
 import com.python.cat.potato.base.BaseApplication;
-import com.python.cat.potato.base.BaseFragment;
-import com.python.cat.potato.base.TitleHook;
+import com.python.cat.potato.base.DrawerFragment;
 import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.BaseVM;
@@ -49,19 +48,16 @@ import java.util.Objects;
  * A simple {@link Fragment} subclass.
  * to handle interaction events.
  */
-public class CalendarFragment extends BaseFragment {
-
+public class CalendarFragment extends DrawerFragment {
 
     public static final int REQUEST_ADD_EVENTS = 17;
 
-    private TitleHook hook;
     static long extraPos = 0; // 给系统日历的
     private CalendarInfoAdapter adapter;
     private CalDeletePop deletePop;
     private ContentObserver calendarObserver;
     private ContentResolver resolver;
     private TextView tvHeader;
-
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -83,35 +79,9 @@ public class CalendarFragment extends BaseFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof TitleHook) {
-            hook = (TitleHook) context;
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        hook = null;
-    }
-
-    @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         LogUtils.w("..." + isVisibleToUser);
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        showCurrentTitle();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -162,17 +132,11 @@ public class CalendarFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LogUtils.d(view + " , " + savedInstanceState + " ### " + hook);
+        LogUtils.d(view + " , " + savedInstanceState + " ### ");
         initOperationLayout(view);
         initShowDataLayout(view);
     }
 
-    private void showCurrentTitle() {
-        if (hook != null) {
-            hook.setFragmentTitle(getClass().getSimpleName());
-            LogUtils.d("setFragmentTitle" + getClass().getSimpleName());
-        }
-    }
 
     private void initShowDataLayout(View view) {
         if (getActivity() == null) {

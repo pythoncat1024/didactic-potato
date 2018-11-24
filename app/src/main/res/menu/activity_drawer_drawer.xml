@@ -5,32 +5,32 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_view"
+            android:icon="@drawable/ic_directions_bike_black_24dp"
+            android:title="@string/view" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="@string/gallery" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="@string/slideshow" />
         <item
             android:id="@+id/nav_calendar"
             android:icon="@drawable/ic_menu_event_black_24dp"
-            android:title="Calendar" />
+            android:title="@string/calendar" />
         <item
             android:id="@+id/nav_todo"
             android:icon="@drawable/ic_menu_format_list_numbered_black_24dp"
-            android:title="TODO" />
+            android:title="@string/todo" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="@string/tools" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/communicate">
         <menu>
             <item
                 android:id="@+id/nav_share"
