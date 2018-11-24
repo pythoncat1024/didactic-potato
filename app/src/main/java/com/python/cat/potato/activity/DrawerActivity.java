@@ -21,7 +21,7 @@ import com.python.cat.potato.fragment.ViewFragment;
 import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,TitleHook {
+        implements NavigationView.OnNavigationItemSelectedListener, TitleHook {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -124,7 +124,7 @@ public class DrawerActivity extends BaseActivity
     }
 
     private void showViewFragment() {
-        com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+        com.apkfuns.logutils.LogUtils.v("show default fragment...");
         ViewFragment fragment = ViewFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
         BaseVM.jump2Target(fragmentManager, fragment,

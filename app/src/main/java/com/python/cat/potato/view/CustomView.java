@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -16,6 +18,7 @@ public class CustomView extends View {
     private int mY;
     private Paint paint;
     private Rect rect;
+    private Path path;
 
     public CustomView(Context context) {
         this(context, null);
@@ -37,10 +40,12 @@ public class CustomView extends View {
 
     private void init() {
         paint = new Paint();
-        paint.setStrokeWidth(20);
+        paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(50);
         rect = new Rect();
         rect.set(100, 100, 400, 400);
+        path = new Path();
 
     }
 
@@ -50,9 +55,22 @@ public class CustomView extends View {
         if (rect.contains(mX, mY)) {
             paint.setColor(Color.RED);
         } else {
-            paint.setColor(Color.GREEN);
+            paint.setColor(Color.BLUE);
         }
-        canvas.drawRect(rect, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        path.moveTo(49, 49);
+        // forceMoveTo: 强制不连接之前的路径
+        path.arcTo(new RectF(rect), 45, 90, true);
+
+        path.addArc(500, 500, 600, 600, -90, -180);
+        canvas.drawPath(path, paint);
+
+        RectF oval = new RectF(100, 700, 700, 1000);
+        path.reset();
+        path.addOval(oval, Path.Direction.CW);
+        String text = "我是比亚迪车主，你是比亚迪";
+        canvas.drawTextOnPath(text,path,0,0,paint);
+        canvas.drawPath(path, paint);
     }
 
     @Override

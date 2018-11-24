@@ -31,7 +31,7 @@ public class WelcomeActivity extends BaseActivity {
             Disposable subscribe = welcomeVM.interval(GlobalInfo.LOADING_SECONDS)
                     .doOnComplete(this::jump2content)
                     .subscribe(t -> {
-                                LogUtils.d("t==" + t);
+                                LogUtils.v("t==" + t);
                                 tv.setText(getString(R.string.welcome_text, t));
                             }, Throwable::printStackTrace
                     );
