@@ -12,9 +12,9 @@ public class ToastHelper {
     private static Toast tn;
 
 
-    public static void show(@NonNull Context context, CharSequence text) {
+    public static void show(@NonNull Context context, Object text) {
         cancel();
-        tn = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+        tn = Toast.makeText(context, text.toString(), Toast.LENGTH_SHORT);
         tn.show();
     }
 

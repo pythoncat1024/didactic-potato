@@ -1,5 +1,6 @@
 package com.python.cat.potato.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
