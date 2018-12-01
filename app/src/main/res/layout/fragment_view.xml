@@ -9,12 +9,19 @@
     <com.python.cat.potato.view.CustomView
         android:id="@+id/view_fragment_custom_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.python.cat.potato.view.MenuView
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom|end" />
+        android:visibility="visible" />
+
+    <com.python.cat.potato.view.散弹枪
+        android:id="@+id/view_gun"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="300dp" />
 
 </FrameLayout>

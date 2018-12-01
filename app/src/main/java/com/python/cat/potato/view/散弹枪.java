@@ -12,31 +12,26 @@ import android.widget.FrameLayout;
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 
-public class MenuView extends FrameLayout {
-    private float length;
-    private OnMenuClickListener mListener;
+public class 散弹枪 extends FrameLayout {
     private int maxLen;
     private float lengthFactor;
+    private float length;
 
-    public MenuView(Context context) {
+    public 散弹枪(Context context) {
         this(context, null);
     }
 
-    public MenuView(Context context, AttributeSet attrs) {
+    public 散弹枪(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public MenuView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public 散弹枪(Context context, AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public MenuView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public 散弹枪(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(getContext());
-    }
-
-    private View get() {
-        return this;
+        init(context);
     }
 
     @Override
@@ -51,7 +46,6 @@ public class MenuView extends FrameLayout {
 
     private void init(Context context) {
         LayoutInflater from = LayoutInflater.from(context);
-        LogUtils.v("...");
         View view = from.inflate(R.layout.menu_view_layout, this, false);
         this.addView(view);
         initMenuViews(view);
@@ -72,45 +66,16 @@ public class MenuView extends FrameLayout {
         menu.setOnClickListener(v -> {
             LogUtils.d("sin90:" + Math.sin(Math.toRadians(90))); // ok
             LogUtils.d("sin30:" + Math.sin(Math.toRadians(30))); // ok
-            if (!isMenuOpen) {
-                menuOpen(sa1, sa2, sa3, sa4, sa5);
-            } else {
-                menuClose(sa1, sa2, sa3, sa4, sa5);
-
-            }
+//            if (!isMenuOpen) {
+//                menuOpen(sa1, sa2, sa3, sa4, sa5);
+//            } else {
+//                menuClose(sa1, sa2, sa3, sa4, sa5);
+//
+//            }
             isMenuOpen = !isMenuOpen;
+            menuOpen(sa1, sa2, sa3, sa4, sa5);
         });
 
-        innerListener(sa1, sa2, sa3, sa4, sa5);
-
-    }
-
-    private void innerListener(View sa1, View sa2, View sa3, View sa4, View sa5) {
-        sa1.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.click(0, sa1, get());
-            }
-        });
-        sa2.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.click(1, sa2, get());
-            }
-        });
-        sa3.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.click(2, sa3, get());
-            }
-        });
-        sa4.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.click(3, sa4, get());
-            }
-        });
-        sa5.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.click(4, sa5, get());
-            }
-        });
     }
 
     private void menuClose(View sa1, View sa2, View sa3, View sa4, View sa5) {
@@ -143,11 +108,11 @@ public class MenuView extends FrameLayout {
     private AnimatorSet buildOpenAnimate(View target, int index, int count) {
         AnimatorSet set = new AnimatorSet();
 //        sa1.setScaleX();
-        ObjectAnimator scaleXAn = ObjectAnimator.ofFloat(target, "scaleX", 1f, 0.5f, 0.1f, 0.1f, 1f);
-        ObjectAnimator scaleYAn = ObjectAnimator.ofFloat(target, "scaleY", 1f, 0.5f, 0.1f, 0.1f, 1f);
+        ObjectAnimator scaleXAn = ObjectAnimator.ofFloat(target, "scaleX", 1.0f, 0.5f, 0.1f, 0.1f, 0.8f);
+        ObjectAnimator scaleYAn = ObjectAnimator.ofFloat(target, "scaleY", 1f, 0.5f, 0.1f, 0.1f, 0.8f);
 //        sa1.setAlpha();
         ObjectAnimator alphaAn = ObjectAnimator.ofFloat(target, "alpha", 1f, 0.3f, 0.6f);
-        // sa1.setTranslationX();
+//        sa1.setTranslationX();
         float radians = (float) Math.toRadians(-90 + (-90) * index / (count - 1));
         float x = (float) (Math.sin(radians) * length);
         float y = (float) (Math.cos(radians) * length);
@@ -157,7 +122,6 @@ public class MenuView extends FrameLayout {
         ObjectAnimator translationXAn = ObjectAnimator.ofFloat(target, "TranslationX", 0f, x);
         ObjectAnimator translationYAn = ObjectAnimator.ofFloat(target, "TranslationY", 0f, y);
         set.playTogether(scaleXAn, scaleYAn, alphaAn, translationXAn, translationYAn);
-//        set.setInterpolator(new OvershootInterpolator());
         set.setDuration(800);
         return set;
     }
@@ -182,15 +146,4 @@ public class MenuView extends FrameLayout {
         return set;
     }
 
-    public interface OnMenuClickListener {
-        void click(int index, View menu, View parent);
-    }
-
-    public void setOnMenuClickListener(OnMenuClickListener length) {
-        this.mListener = length;
-    }
-
-    public void setLengthFactor(float factor) {
-        this.lengthFactor = factor;
-    }
 }
