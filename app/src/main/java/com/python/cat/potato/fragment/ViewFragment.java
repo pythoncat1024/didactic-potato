@@ -1,14 +1,11 @@
 package com.python.cat.potato.fragment;
 
-import android.animation.FloatEvaluator;
-import android.animation.IntEvaluator;
-import android.animation.Keyframe;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,13 +13,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.BounceInterpolator;
-import android.widget.ViewAnimator;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.DrawerFragment;
-import com.python.cat.potato.view.CharTextView;
+
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,37 +59,51 @@ public class ViewFragment extends DrawerFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        View callRing = view.findViewById(R.id.iv_call_ring);
-        PropertyValuesHolder rotationH = PropertyValuesHolder.ofFloat("rotation",
-                -60f, -10f, 0, 60f, 0f);
-        PropertyValuesHolder scaleXH = PropertyValuesHolder.ofFloat("scaleX",
-                1.0f, 0.7f, 1.2f, 1, 0.3f, 1f);
-        scaleXH.setKeyframes(Keyframe.ofFloat(0, 1f),
-                Keyframe.ofFloat(0.3f, 0.4f),
-                Keyframe.ofFloat(0.5f, 2f),
-                Keyframe.ofFloat(0.8f, 0.8f),
-                Keyframe.ofFloat(1f, 1f)
-        ); // 无效 --> setKeyframes 估计只对 ofObject 有效果
-        scaleXH.setEvaluator(new FloatEvaluator());
-        PropertyValuesHolder scaleYH = PropertyValuesHolder.ofFloat("scaleY",
-                1.0f, 0.7f, 1.2f, 1, 0.3f, 1f);
-        scaleYH.setKeyframes(Keyframe.ofFloat(0, 1f),
-                Keyframe.ofFloat(0.3f, 0.4f),
-                Keyframe.ofFloat(0.5f, 2f),
-                Keyframe.ofFloat(0.8f, 0.8f),
-                Keyframe.ofFloat(1f, 1f)
-        );
-        scaleYH.setEvaluator(new FloatEvaluator());
-        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(callRing,
-                rotationH, scaleXH, scaleYH);
-        view.findViewById(R.id.btn_start)
-                .setOnClickListener(v -> {
-                    animator.setDuration(2000);
-//                    animator.setRepeatCount(Animation.INFINITE);
-                    animator.setRepeatMode(ValueAnimator.REVERSE);
-                    animator.start();
-                });
+        ListView lv = view.findViewById(R.id.list_view);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(lv.getContext(),
+                android.R.layout.simple_expandable_list_item_1);
+        adapter.addAll(getResources().getStringArray(android.R.array.postalAddressTypes));
+        lv.setAdapter(adapter);
 
+        view.findViewById(R.id.btn_add)
+                .setOnClickListener(v -> {
+                    int bound = adapter.getCount() - 1;
+                    bound = bound <= 1 ? 1 : bound;
+                    int index = new Random().nextInt(bound);
+                    index = index <= 0 ? 0 : index;
+                    adapter.insert(UUID.randomUUID().toString(), index);
+                });
+        view.findViewById(R.id.btn_remove).setOnClickListener(v -> {
+            int bound = adapter.getCount() - 1;
+            if (bound <= 0) return;
+            int index = new Random().nextInt(bound);
+            View childAt = lv.getChildAt(index);
+            PropertyValuesHolder removeX = PropertyValuesHolder.ofFloat("translationX",
+                    0, childAt.getWidth(), 0); // 向右滚粗
+            removeX = PropertyValuesHolder.ofFloat("translationY",
+                    0, -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), 0);
+            LogUtils.d(childAt);
+            PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 1f);
+            ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, removeX,alpha);
+            animator.setDuration(500);
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    adapter.remove(adapter.getItem(index));
+                }
+            });
+            animator.start();
+
+        });
+
+        LayoutTransition transition = new LayoutTransition();
+        ObjectAnimator animator = ObjectAnimator.ofFloat((View) null, "translationY", -100f, 80f, 0);
+        transition.setAnimator(LayoutTransition.DISAPPEARING, animator); // 无效
+        transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, animator); // 无效
+        transition.setAnimator(LayoutTransition.APPEARING, animator);
+        transition.setAnimator(LayoutTransition.CHANGE_APPEARING, animator);
+        lv.setLayoutTransition(transition);
     }
 
 
