@@ -5,30 +5,18 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ViewFragment">
 
-
-    <com.python.cat.potato.view.CustomView
-        android:id="@+id/view_fragment_custom_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <com.python.cat.potato.view.MenuView
-        android:id="@+id/menu_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
-
-    <com.python.cat.potato.view.散弹枪
-        android:id="@+id/view_gun"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="300dp" />
-
-    <TextView
-        tools:text="s"
+    <com.python.cat.potato.view.CharTextView
         android:id="@+id/char_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:textSize="36sp" />
+        android:textSize="36sp"
+        tools:text="s" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="@string/text_start" />
 </FrameLayout>

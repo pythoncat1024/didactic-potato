@@ -1,25 +1,26 @@
 package com.python.cat.potato.fragment;
 
+import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
-import android.widget.TextView;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.DrawerFragment;
-import com.python.cat.potato.utils.ToastHelper;
-import com.python.cat.potato.view.CustomView;
-import com.python.cat.potato.view.MenuView;
+import com.python.cat.potato.view.CharTextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,43 +58,38 @@ public class ViewFragment extends DrawerFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CustomView cv = view.findViewById(R.id.view_fragment_custom_view);
-        cv.setOnAreaClickListener((v, area) -> {
-            ToastHelper.show(v.getContext(), area.name());
-            LogUtils.w("area click --" + area.name());
-        });
 
-        cv.setOnClickListener(v -> {
-            ToastHelper.show(v.getContext(), "click....");
-            LogUtils.w("click...");
-        });
-        MenuView viewById = view.findViewById(R.id.menu_view);
+        CharTextView tvChar = view.findViewById(R.id.char_tv);
+        tvChar.setCharText('X');
+        PropertyValuesHolder charHolder = PropertyValuesHolder.ofObject("CharText",
+                new CharEvaluator(), 'A', 'Z');
+        charHolder.setKeyframes(Keyframe.ofObject(0, 'A'),
+                Keyframe.ofObject(0.1f, 'M'),
+                Keyframe.ofObject(0.5f, 'G'),
+                Keyframe.ofObject(0.8f, 'M'),
+                Keyframe.ofObject(1f, 'Z')
+        );
+        PropertyValuesHolder translationY = PropertyValuesHolder.ofFloat("TranslationY", 0, 1000, 700, 1400, 0);
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(tvChar, charHolder, translationY);
+        view.findViewById(R.id.btn_start)
+                .setOnClickListener(v -> {
+                    animator.setDuration(6000);
+                    animator.setInterpolator(new BounceInterpolator());
+                    animator.start();
+                });
 
-        viewById.setLengthFactor(0.5f);
-        viewById.setOnMenuClickListener((index, menu, parent) -> {
-            ToastHelper.show(view.getContext(), menu);
-            LogUtils.d(menu.toString());
-        });
+    }
 
+    private class CharEvaluator implements TypeEvaluator<Character> {
 
-        TextView tvChar = view.findViewById(R.id.char_tv);
-
-        ValueAnimator animator = ValueAnimator.ofObject((fraction, startValue, endValue) -> {
-            char start = (Character) startValue;
-            char end = (Character) endValue;
-            return (int) (start + (end - start) * fraction);
-        }, 'A', 'Z');
-
-        animator.addUpdateListener(animation -> {
-            int s = (Integer) animation.getAnimatedValue();
-            char ss = (char) s;
-            com.apkfuns.logutils.LogUtils.w("ss==" + ss);
-            tvChar.setText(String.format("%s", ss));
-        });
-
-        animator.setDuration(10000);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.start();
+        @Override
+        public Character evaluate(float fraction, Character startValue, Character endValue) {
+            int sta = startValue;
+            int end = endValue;
+            char c = (char) (sta + (end - sta) * fraction);
+//            LogUtils.e("char=== " + c);
+            return c;
+        }
     }
 
 
