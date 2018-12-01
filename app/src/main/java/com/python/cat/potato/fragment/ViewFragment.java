@@ -71,7 +71,25 @@ public class ViewFragment extends DrawerFragment {
                     bound = bound <= 1 ? 1 : bound;
                     int index = new Random().nextInt(bound);
                     index = index <= 0 ? 0 : index;
-                    adapter.insert(UUID.randomUUID().toString(), index);
+
+                    View childAt = lv.getChildAt(index);
+                    PropertyValuesHolder addX = PropertyValuesHolder.ofFloat("translationX",
+                            0, -childAt.getWidth(), childAt.getWidth(), childAt.getWidth(), 0);
+                    // 向左滚粗
+                    LogUtils.d(childAt);
+                    PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 1f);
+                    ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, addX, alpha);
+                    animator.setDuration(500);
+
+                    final int pos = index;
+                    animator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            adapter.insert(UUID.randomUUID().toString(), pos);
+                        }
+                    });
+                    animator.start();
                 });
         view.findViewById(R.id.btn_remove).setOnClickListener(v -> {
             int bound = adapter.getCount() - 1;
@@ -84,7 +102,7 @@ public class ViewFragment extends DrawerFragment {
                     0, -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), 0);
             LogUtils.d(childAt);
             PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 1f);
-            ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, removeX,alpha);
+            ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, removeX, alpha);
             animator.setDuration(500);
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -96,14 +114,6 @@ public class ViewFragment extends DrawerFragment {
             animator.start();
 
         });
-
-        LayoutTransition transition = new LayoutTransition();
-        ObjectAnimator animator = ObjectAnimator.ofFloat((View) null, "translationY", -100f, 80f, 0);
-        transition.setAnimator(LayoutTransition.DISAPPEARING, animator); // 无效
-        transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, animator); // 无效
-        transition.setAnimator(LayoutTransition.APPEARING, animator);
-        transition.setAnimator(LayoutTransition.CHANGE_APPEARING, animator);
-        lv.setLayoutTransition(transition);
     }
 
 
