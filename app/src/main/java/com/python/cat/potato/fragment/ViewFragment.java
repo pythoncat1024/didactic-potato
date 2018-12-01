@@ -1,7 +1,8 @@
 package com.python.cat.potato.fragment;
 
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
@@ -72,6 +75,25 @@ public class ViewFragment extends DrawerFragment {
             LogUtils.d(menu.toString());
         });
 
+
+        TextView tvChar = view.findViewById(R.id.char_tv);
+
+        ValueAnimator animator = ValueAnimator.ofObject((fraction, startValue, endValue) -> {
+            char start = (Character) startValue;
+            char end = (Character) endValue;
+            return (int) (start + (end - start) * fraction);
+        }, 'A', 'Z');
+
+        animator.addUpdateListener(animation -> {
+            int s = (Integer) animation.getAnimatedValue();
+            char ss = (char) s;
+            com.apkfuns.logutils.LogUtils.w("ss==" + ss);
+            tvChar.setText(String.format("%s", ss));
+        });
+
+        animator.setDuration(10000);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.start();
     }
 
 
