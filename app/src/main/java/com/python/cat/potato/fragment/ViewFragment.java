@@ -1,5 +1,7 @@
 package com.python.cat.potato.fragment;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import com.python.cat.potato.R;
 import com.python.cat.potato.base.DrawerFragment;
 import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.view.CustomView;
+import com.python.cat.potato.view.MenuView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,7 +64,16 @@ public class ViewFragment extends DrawerFragment {
             ToastHelper.show(v.getContext(), "click....");
             LogUtils.w("click...");
         });
+        MenuView viewById = view.findViewById(R.id.menu_view);
+
+        viewById.setLengthFactor(0.5f);
+        viewById.setOnMenuClickListener((index, menu, parent) -> {
+            ToastHelper.show(view.getContext(), menu);
+            LogUtils.d(menu.toString());
+        });
+
     }
+
 
     @Override
     public void onAttach(Context context) {

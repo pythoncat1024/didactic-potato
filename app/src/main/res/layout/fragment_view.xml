@@ -10,4 +10,11 @@
         android:id="@+id/view_fragment_custom_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.python.cat.potato.view.MenuView
+        android:id="@+id/menu_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|end" />
+
 </FrameLayout>
