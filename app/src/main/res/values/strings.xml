@@ -61,4 +61,6 @@
     <string name="text_start">开始</string>
     <string name="text_add">添加</string>
     <string name="text_remove">移除</string>
+    <string name="share">Share</string>
+    <string name="send">Send</string>
 </resources>
