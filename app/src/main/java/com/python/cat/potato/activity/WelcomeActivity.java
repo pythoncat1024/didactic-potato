@@ -2,8 +2,6 @@ package com.python.cat.potato.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -34,8 +32,12 @@ public class WelcomeActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         welcomeVM = new WelcomeVM();
         welcomeRootV = findViewById(R.id.welcome_root_view);
-        Animation animation = AnimationUtils.loadAnimation(get(), R.anim.scale_bg_bigger);
-        welcomeRootV.startAnimation(animation);
+//        Animation animation = AnimationUtils.loadAnimation(get(), R.anim.scale_bg_bigger);
+//        welcomeRootV.startAnimation(animation);
+
+        Animator animator = AnimatorInflater.loadAnimator(get(), R.animator.scale_xy);
+        animator.setTarget(welcomeRootV);
+        animator.start();
         TextView tv = findViewById(R.id.tv_text);
         if (GlobalInfo.SHOW_LOADING) {
 
