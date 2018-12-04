@@ -10,4 +10,5 @@
     <color name="gray">#eee</color>
     <color name="line_divider">#eee</color>
     <color name="blackTransparent">#a000</color>
+    <color name="blackTransparent_more">#5000</color>
 </resources>

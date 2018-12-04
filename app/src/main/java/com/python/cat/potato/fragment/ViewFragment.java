@@ -59,61 +59,7 @@ public class ViewFragment extends DrawerFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ListView lv = view.findViewById(R.id.list_view);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(lv.getContext(),
-                android.R.layout.simple_expandable_list_item_1);
-        adapter.addAll(getResources().getStringArray(android.R.array.postalAddressTypes));
-        lv.setAdapter(adapter);
 
-        view.findViewById(R.id.btn_add)
-                .setOnClickListener(v -> {
-                    int bound = adapter.getCount() - 1;
-                    bound = bound <= 1 ? 1 : bound;
-                    int index = new Random().nextInt(bound);
-                    index = index <= 0 ? 0 : index;
-
-                    View childAt = lv.getChildAt(index);
-                    PropertyValuesHolder addX = PropertyValuesHolder.ofFloat("translationX",
-                            0, -childAt.getWidth(), childAt.getWidth(), childAt.getWidth(), 0);
-                    // 向左滚粗
-                    LogUtils.d(childAt);
-                    PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 1f);
-                    ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, addX, alpha);
-                    animator.setDuration(500);
-
-                    final int pos = index;
-                    animator.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            adapter.insert(UUID.randomUUID().toString(), pos);
-                        }
-                    });
-                    animator.start();
-                });
-        view.findViewById(R.id.btn_remove).setOnClickListener(v -> {
-            int bound = adapter.getCount() - 1;
-            if (bound <= 0) return;
-            int index = new Random().nextInt(bound);
-            View childAt = lv.getChildAt(index);
-            PropertyValuesHolder removeX = PropertyValuesHolder.ofFloat("translationX",
-                    0, childAt.getWidth(), 0); // 向右滚粗
-            removeX = PropertyValuesHolder.ofFloat("translationY",
-                    0, -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), -childAt.getHeight(), 0);
-            LogUtils.d(childAt);
-            PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha", 1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 1f);
-            ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(childAt, removeX, alpha);
-            animator.setDuration(500);
-            animator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    adapter.remove(adapter.getItem(index));
-                }
-            });
-            animator.start();
-
-        });
     }
 
 

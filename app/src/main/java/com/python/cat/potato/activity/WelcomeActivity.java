@@ -1,7 +1,14 @@
 package com.python.cat.potato.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
@@ -16,6 +23,7 @@ import io.reactivex.disposables.Disposable;
 public class WelcomeActivity extends BaseActivity {
 
     private WelcomeVM welcomeVM;
+    private View welcomeRootV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +33,9 @@ public class WelcomeActivity extends BaseActivity {
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
         welcomeVM = new WelcomeVM();
+        welcomeRootV = findViewById(R.id.welcome_root_view);
+        Animation animation = AnimationUtils.loadAnimation(get(), R.anim.scale_bg_bigger);
+        welcomeRootV.startAnimation(animation);
         TextView tv = findViewById(R.id.tv_text);
         if (GlobalInfo.SHOW_LOADING) {
 
