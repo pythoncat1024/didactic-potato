@@ -1,13 +1,16 @@
 package com.python.cat.potato.activity;
 
 import android.animation.Animator;
-import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
@@ -16,42 +19,48 @@ import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.viewmodel.BaseVM;
 import com.python.cat.potato.viewmodel.WelcomeVM;
 
-import io.reactivex.disposables.Disposable;
-
 public class WelcomeActivity extends BaseActivity {
-
-    private WelcomeVM welcomeVM;
-    private View welcomeRootV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.app_name);
-        setSupportActionBar(toolbar);
-        welcomeVM = new WelcomeVM();
-        welcomeRootV = findViewById(R.id.welcome_root_view);
-//        Animation animation = AnimationUtils.loadAnimation(get(), R.anim.scale_bg_bigger);
-//        welcomeRootV.startAnimation(animation);
+        View decorView = getWindow().getDecorView();
+        Drawable background = decorView.getBackground();
+        LogUtils.e(background.toString());
 
-        Animator animator = AnimatorInflater.loadAnimator(get(), R.animator.scale_xy);
-        animator.setTarget(welcomeRootV);
-        animator.start();
-        TextView tv = findViewById(R.id.tv_text);
         if (GlobalInfo.SHOW_LOADING) {
-
-            Disposable subscribe = welcomeVM.interval(GlobalInfo.LOADING_SECONDS)
-                    .doOnComplete(this::jump2content)
-                    .subscribe(t -> {
-                                LogUtils.v("t==" + t);
-                                tv.setText(getString(R.string.welcome_text, t));
-                            }, Throwable::printStackTrace
-                    );
-            addDisposable(subscribe);
+            showDecorViewAnimate(decorView);
         } else {
-            jump2content();
+            new WelcomeVM().interval(1).doOnSubscribe(sbs -> jump2content()).subscribe();
         }
+//        Animation animation = AnimationUtils.loadAnimation(get(), R.anim.scale_bg_bigger);
+//        decorView.startAnimation(animation); // 对 decorView 无效, 对 textView 有效
+
+    }
+
+    private void showDecorViewAnimate(View decorView) {
+        PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat("alpha",
+                1.0f, 1.0f);
+        PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat("scaleX",
+                1.0f, 1.5f, 2.0f, 1.5f, 1.0f);
+        PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat("scaleY",
+                1.0f, 1.5f, 2.0f, 1.5f, 1.0f);
+        ObjectAnimator appear = ObjectAnimator.ofPropertyValuesHolder(decorView,
+                scaleX, scaleY)
+                .setDuration(GlobalInfo.LOADING_SECONDS * 1000);
+        ObjectAnimator disappear = ObjectAnimator.ofFloat(decorView, "alpha",
+                1.0f, 1.0f); // 透明度动画对 decorView 显示很奇怪
+        AnimatorSet set = new AnimatorSet();
+        set.playSequentially(appear);
+        set.start();
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                new WelcomeVM().interval(1).doOnSubscribe(sbs -> jump2content()).subscribe();
+            }
+        });
     }
 
     private void jump2content() {
@@ -60,7 +69,33 @@ public class WelcomeActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        welcomeVM = null;
+        WelcomeVM welcomeVM = null;
         super.onDestroy();
     }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        navigationBarStatusBar(get(), hasFocus);
+    }
+
+    /**
+     * https://blog.csdn.net/qiyei2009/article/details/74435809
+     * 导航栏，状态栏隐藏
+     */
+    @SuppressLint("ObsoleteSdkInt")
+    public static void navigationBarStatusBar(Activity activity, boolean hasFocus) {
+        if (hasFocus && Build.VERSION.SDK_INT >= 19) {
+            View decorView = activity.getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
+
 }

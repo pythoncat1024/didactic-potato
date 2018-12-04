@@ -13,6 +13,32 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.Welcome">
+        <item name="android:navigationBarColor">@color/colorTransparent</item> <!-- useless -->
+        <item name="android:statusBarColor">@color/colorTransparent
+        </item> <!-- 这个属性可以隐藏 statusBar-->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item> <!-- useless -->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@drawable/asaba_hojo</item>
+
+        <!-- 动画属性无效 -->
+        <item name="android:fromXScale">1.0</item>
+        <item name="android:fromYScale">1.0</item>
+        <item name="android:toXScale">1.5</item>
+        <item name="android:duration">3000</item>
+        <item name="android:fillAfter">true</item>
+        <item name="android:pivotX">50%</item>
+        <item name="android:pivotY">50%</item>
+
+        <!-- 动画属性无效 -->
+        <item name="android:propertyName">"scaleX"</item>
+        <item name="android:valueFrom">1.0</item>
+        <item name="android:valueTo">1.5</item>
+        <item name="android:valueType">floatType</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -29,5 +55,11 @@
     <style name="BottomPopupWindow">
         <item name="android:windowEnterAnimation">@anim/pop_in</item>
         <item name="android:windowExitAnimation">@anim/pop_out</item>
+    </style>
+
+    <style name="AnimationWelcome">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:drawable">@drawable/asaba_hojo</item>
+        <item name="android:animation">@anim/scale_bg_bigger</item>
     </style>
 </resources>
