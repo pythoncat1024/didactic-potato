@@ -6,8 +6,8 @@
     tools:context=".fragment.ViewFragment">
 
 
-    <com.python.cat.potato.view.TextUI
-        android:id="@+id/view_text_ui"
+    <com.python.cat.potato.view.CustomView
+        android:id="@+id/view_custom_ui"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
