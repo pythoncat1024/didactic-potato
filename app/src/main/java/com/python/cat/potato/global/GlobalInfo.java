@@ -1,6 +1,7 @@
 package com.python.cat.potato.global;
 
 public class GlobalInfo {
+
     private GlobalInfo() {
     }
 
@@ -15,4 +16,8 @@ public class GlobalInfo {
 
         String KEY_EVENT_ID = "key_event_id";
     }
+
+
+    public static final String SP_KEY_USERNAME = "sp_key_username";
+    public static final String SP_KEY_COOKIE = "Cookie";
 }

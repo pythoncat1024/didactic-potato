@@ -12,6 +12,12 @@ import android.view.ViewGroup;
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.DrawerFragment;
+import com.python.cat.potato.domain.TODO;
+import com.python.cat.potato.global.GlobalInfo;
+import com.python.cat.potato.net.HttpRequest;
+import com.python.cat.potato.utils.SpUtils;
+
+import io.reactivex.Flowable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +53,19 @@ public class TODOFragment extends DrawerFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LogUtils.d(view + " , " + savedInstanceState + " ### ");
+
+        String cookie = SpUtils.get(getContext(), GlobalInfo.SP_KEY_COOKIE);
+        if (cookie.length() > 0) {
+            LogUtils.i("request todo use cookie: " + cookie);
+            Flowable<TODO> todo = HttpRequest.queryTodo(cookie, 1);
+            addDisposable(todo.subscribe(info -> {
+                LogUtils.d("todo info");
+                LogUtils.d(info);
+            }, Throwable::printStackTrace));
+        } else {
+            LogUtils.e("need sign in first");
+        }
+
     }
 
 }

@@ -44,4 +44,8 @@ public class BaseApplication extends Application {
     public static class Holder {
         public static Application app;
     }
+
+    public static Application get() {
+        return Holder.app;
+    }
 }

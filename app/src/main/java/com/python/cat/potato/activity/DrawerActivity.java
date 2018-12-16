@@ -10,14 +10,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
 import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
+import com.python.cat.potato.fragment.LoginFragment;
 import com.python.cat.potato.fragment.TODOFragment;
 import com.python.cat.potato.fragment.ViewFragment;
+import com.python.cat.potato.global.GlobalInfo;
+import com.python.cat.potato.utils.SpUtils;
 import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
@@ -40,18 +46,36 @@ public class DrawerActivity extends BaseActivity
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        initNavHeader();
         drawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
+                R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                initNavHeader();
+            }
+        };
         drawerLayout.addDrawerListener(drawerToggle);
-
-        // default show calendar
-        showDefaultFragment(R.id.nav_view);
+        showDefaultFragment();
     }
 
-    private void showDefaultFragment(int navID) {
-        navigationView.setCheckedItem(navID); // 并不会调用点击的逻辑，只是UI 显示
-        navFragment(navID);
+    private void initNavHeader() {
+        // app:headerLayout="@layout/nav_header_drawer"
+        LinearLayout headerView = (LinearLayout) navigationView.getHeaderView(0);
+        TextView tvUsername = headerView.findViewById(R.id.textView_username);
+        tvUsername.setText(SpUtils.get(this, GlobalInfo.SP_KEY_USERNAME));
+        headerView.setOnClickListener(v -> {
+            showLoginFragment();
+            closeDrawer();
+        });
+    }
+
+    private void showDefaultFragment() {
+        // default show calendar
+        navigationView.setCheckedItem(R.id.nav_view); // 并不会调用点击的逻辑，只是UI 显示
+        navFragment(R.id.nav_view);
     }
 
     @Override
@@ -106,7 +130,7 @@ public class DrawerActivity extends BaseActivity
 
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_tools) {
 
         } else if (id == R.id.nav_share) {
 
@@ -119,6 +143,10 @@ public class DrawerActivity extends BaseActivity
             showTODOFragment();
         }
 
+        closeDrawer();
+    }
+
+    private void closeDrawer() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
@@ -142,13 +170,23 @@ public class DrawerActivity extends BaseActivity
     }
 
     private void showTODOFragment() {
-        com.apkfuns.logutils.LogUtils.v("click nav calendar...");
+        com.apkfuns.logutils.LogUtils.v("click nav todo...");
         TODOFragment fragment = TODOFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
         BaseVM.jump2Target(fragmentManager, fragment,
                 R.id.drawer_content_frame_layout, false, true);
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }
+
+    private void showLoginFragment() {
+        com.apkfuns.logutils.LogUtils.v("click nav header...");
+        LoginFragment fragment = LoginFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        BaseVM.jump2Target(fragmentManager, fragment,
+                R.id.drawer_content_frame_layout, false, true);
+        toolbar.setTitle(fragment.getClass().getSimpleName());
+    }
+
 
     @Override
     public void setFragmentTitle(String simpleName) {

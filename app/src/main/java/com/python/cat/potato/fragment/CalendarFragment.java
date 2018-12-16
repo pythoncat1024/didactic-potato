@@ -219,6 +219,14 @@ public class CalendarFragment extends DrawerFragment {
         super.onDestroy();
     }
 
+    private void jump2AddEvent() {
+        if (getActivity() == null) {
+            LogUtils.w("attached activity disappeared ...");
+            return;
+        }
+        BaseVM.jump2Target(getActivity(), EventInfoActivity.class, true);
+    }
+
     private void doAddEvent() {
         // 添加事件
         LogUtils.v("");

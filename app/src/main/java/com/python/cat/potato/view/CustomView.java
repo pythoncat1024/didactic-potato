@@ -13,8 +13,6 @@ public class CustomView extends View {
 
     private Paint paint;
     private Path path;
-    private float downX;
-    private float downY;
 
     public CustomView(Context context) {
         this(context, null);
@@ -49,39 +47,15 @@ public class CustomView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        path.moveTo(100, 100);
-//        path.quadTo(400, 400, 800, 100);
+        path.moveTo(100, 300);
+        path.quadTo(200, 200, 300, 300);
+        path.quadTo(400, 400, 500, 300);
         canvas.drawPath(path, paint);
     }
 
     @Override
     public boolean performClick() {
         return super.performClick();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                downX = event.getX();
-                downY = event.getY();
-                path.moveTo(downX, downY);
-                invalidate();
-                return true; // 让 move up 都能被触发
-            case MotionEvent.ACTION_MOVE:
-                float moveX = event.getX();
-                float moveY = event.getY();
-                path.quadTo(downX, downY, downX / 2 + moveX / 2,
-                        downY / 2 + moveY / 2);
-                downX = moveX;
-                downY = moveY;
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                performClick();
-                break;
-        }
-        return super.onTouchEvent(event);
     }
 
 

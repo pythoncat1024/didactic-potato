@@ -25,7 +25,7 @@
             android:icon="@drawable/ic_menu_format_list_numbered_black_24dp"
             android:title="@string/todo" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_tools"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/tools" />
     </group>
