@@ -3,7 +3,7 @@ package com.python.cat.potato.net;
 import android.support.annotation.NonNull;
 
 import com.python.cat.potato.domain.LoginResult;
-import com.python.cat.potato.domain.TODO;
+import com.python.cat.potato.domain.ScheduleTask;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -36,7 +36,7 @@ public class HttpRequest {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public static Flowable<TODO> queryTodo(String cookie, int currentPage) {
+    public static Flowable<ScheduleTask> queryTodo(String cookie, int currentPage) {
         HttpService service = getHttpService();
         return service.queryTodo(cookie, currentPage)
                 .subscribeOn(Schedulers.io())

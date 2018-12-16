@@ -76,4 +76,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <string name="task_count">待办事项: %1$d</string>
 </resources>

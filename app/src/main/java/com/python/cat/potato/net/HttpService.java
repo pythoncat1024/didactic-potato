@@ -1,10 +1,9 @@
 package com.python.cat.potato.net;
 
 import com.python.cat.potato.domain.LoginResult;
-import com.python.cat.potato.domain.TODO;
+import com.python.cat.potato.domain.ScheduleTask;
 
 import io.reactivex.Flowable;
-import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -29,8 +28,8 @@ interface HttpService {
      * @return domain
      */
     @GET("lg/todo/v2/list/{currentPage}/json")
-    Flowable<TODO> queryTodo(@Header("Cookie") String header,
-                             @Path("currentPage") int currentPage);
+    Flowable<ScheduleTask> queryTodo(@Header("Cookie") String header,
+                                     @Path("currentPage") int currentPage);
 
 
 }

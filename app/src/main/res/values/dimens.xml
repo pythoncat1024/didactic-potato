@@ -9,4 +9,8 @@
     <dimen name="item_divider">10dp</dimen>
     <dimen name="item_padding_start">15dp</dimen>
     <dimen name="item_padding_end">@dimen/item_padding_start</dimen>
+    <dimen name="item_big">16sp</dimen>
+    <dimen name="item_normal">14sp</dimen>
+    <dimen name="item_small">12sp</dimen>
+    <dimen name="item_min">10sp</dimen>
 </resources>

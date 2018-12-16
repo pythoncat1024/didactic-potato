@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#6f00"
     tools:context=".fragment.CalendarFragment">
 
     <LinearLayout
         android:id="@+id/fragment_calendar_operation_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#6f00"
         android:orientation="vertical"
         android:padding="10dp">
 
