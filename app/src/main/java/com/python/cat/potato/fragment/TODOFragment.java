@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
+import com.python.cat.potato.base.BaseFragment;
 import com.python.cat.potato.base.DrawerFragment;
+import com.python.cat.potato.base.NeedLogin;
 import com.python.cat.potato.domain.TODO;
 import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.net.HttpRequest;
 import com.python.cat.potato.utils.SpUtils;
+import com.python.cat.potato.viewmodel.BaseVM;
 
 import io.reactivex.Flowable;
 
@@ -24,6 +27,8 @@ import io.reactivex.Flowable;
  */
 public class TODOFragment extends DrawerFragment {
 
+
+    private NeedLogin needLogin;
 
     public TODOFragment() {
         // Required empty public constructor
@@ -64,8 +69,13 @@ public class TODOFragment extends DrawerFragment {
             }, Throwable::printStackTrace));
         } else {
             LogUtils.e("need sign in first");
+            if (needLogin != null) {
+                needLogin.needLogin();
+            }
         }
-
     }
 
+    public void setNeedLogin(NeedLogin needLogin) {
+        this.needLogin = needLogin;
+    }
 }

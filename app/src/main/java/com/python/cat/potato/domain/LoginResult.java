@@ -43,7 +43,7 @@ public class LoginResult {
 
     @Override
     public String toString() {
-        return "LoginResult{" +
+        return "LoginCallback{" +
                 "data=" + data +
                 ", errorCode=" + errorCode +
                 ", errorMsg='" + errorMsg + '\'' +

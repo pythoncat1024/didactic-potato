@@ -8,6 +8,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,9 @@ import android.widget.TextView;
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.BaseActivity;
+import com.python.cat.potato.base.BaseApplication;
+import com.python.cat.potato.base.LoginCallback;
+import com.python.cat.potato.base.NeedLogin;
 import com.python.cat.potato.base.TitleHook;
 import com.python.cat.potato.fragment.CalendarFragment;
 import com.python.cat.potato.fragment.LoginFragment;
@@ -24,6 +28,7 @@ import com.python.cat.potato.fragment.TODOFragment;
 import com.python.cat.potato.fragment.ViewFragment;
 import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.utils.SpUtils;
+import com.python.cat.potato.utils.ToastHelper;
 import com.python.cat.potato.viewmodel.BaseVM;
 
 public class DrawerActivity extends BaseActivity
@@ -65,17 +70,20 @@ public class DrawerActivity extends BaseActivity
         // app:headerLayout="@layout/nav_header_drawer"
         LinearLayout headerView = (LinearLayout) navigationView.getHeaderView(0);
         TextView tvUsername = headerView.findViewById(R.id.textView_username);
-        tvUsername.setText(SpUtils.get(this, GlobalInfo.SP_KEY_USERNAME));
+        String username = SpUtils.get(this, GlobalInfo.SP_KEY_USERNAME);
+        if (!TextUtils.isEmpty(username)) {
+            tvUsername.setText(username);
+        }
         headerView.setOnClickListener(v -> {
-            showLoginFragment();
+            showLoginFragment(success -> showDefaultFragment());
             closeDrawer();
         });
     }
 
     private void showDefaultFragment() {
         // default show calendar
-        navigationView.setCheckedItem(R.id.nav_view); // 并不会调用点击的逻辑，只是UI 显示
-        navFragment(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.nav_view_custom); // 并不会调用点击的逻辑，只是UI 显示
+        navFragment(R.id.nav_view_custom);
     }
 
     @Override
@@ -123,8 +131,7 @@ public class DrawerActivity extends BaseActivity
     }
 
     private void navFragment(int id) {
-        if (id == R.id.nav_view) {
-            // Handle the camera action
+        if (id == R.id.nav_view_custom) {
             showViewFragment();
         } else if (id == R.id.nav_gallery) {
 
@@ -172,15 +179,31 @@ public class DrawerActivity extends BaseActivity
     private void showTODOFragment() {
         com.apkfuns.logutils.LogUtils.v("click nav todo...");
         TODOFragment fragment = TODOFragment.newInstance();
+        fragment.setNeedLogin(() -> {
+            ToastHelper.show(BaseApplication.get(), "need login first!");
+            showLoginFragment(success -> {
+                if (success) {
+                    navigationView.setCheckedItem(R.id.nav_todo);
+                    showTODOFragment();
+                } else {
+                    showDefaultFragment();
+                }
+            });
+        });
         FragmentManager fragmentManager = getSupportFragmentManager();
         BaseVM.jump2Target(fragmentManager, fragment,
                 R.id.drawer_content_frame_layout, false, true);
         toolbar.setTitle(fragment.getClass().getSimpleName());
     }
 
-    private void showLoginFragment() {
+    private void showLoginFragment(LoginCallback callback) {
+        MenuItem checkedItem = navigationView.getCheckedItem();
+        if (checkedItem != null) {
+            checkedItem.setChecked(false);
+        }
         com.apkfuns.logutils.LogUtils.v("click nav header...");
         LoginFragment fragment = LoginFragment.newInstance();
+        fragment.setLoginResult(callback);
         FragmentManager fragmentManager = getSupportFragmentManager();
         BaseVM.jump2Target(fragmentManager, fragment,
                 R.id.drawer_content_frame_layout, false, true);

@@ -13,7 +13,9 @@ import android.widget.ProgressBar;
 
 import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
+import com.python.cat.potato.base.BaseApplication;
 import com.python.cat.potato.base.BaseFragment;
+import com.python.cat.potato.base.LoginCallback;
 import com.python.cat.potato.global.GlobalInfo;
 import com.python.cat.potato.net.HttpRequest;
 import com.python.cat.potato.utils.SpUtils;
@@ -24,6 +26,8 @@ import com.python.cat.potato.utils.ToastHelper;
  */
 public class LoginFragment extends BaseFragment {
 
+
+    private LoginCallback result;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -57,6 +61,8 @@ public class LoginFragment extends BaseFragment {
         btnSignIn.setOnClickListener(v -> {
             tvUsername.setText("pythoncat");
             tvPassword.setText("wanandroid123");
+            tvUsername.setSelection(tvUsername.length());
+            tvPassword.setSelection(tvPassword.length());
             String username = tvUsername.getText().toString();
             String password = tvPassword.getText().toString();
 
@@ -71,7 +77,7 @@ public class LoginFragment extends BaseFragment {
                                 if (info.errorCode == 0) {
                                     loginProgressBar.setVisibility(View.GONE);
                                     LogUtils.d("login success...");
-                                    ToastHelper.show(getContext(), "login success");
+                                    ToastHelper.show(BaseApplication.get(), "login success");
                                     SpUtils.put(getContext(), GlobalInfo.SP_KEY_USERNAME, username);
                                 } else {
                                     throw new Exception(info.errorMsg);
@@ -79,8 +85,16 @@ public class LoginFragment extends BaseFragment {
                             }, e -> {
                                 loginProgressBar.setVisibility(View.GONE);
                                 LogUtils.e(e);
+                                ToastHelper.show(BaseApplication.get(), e.getMessage());
+                                if (result != null) {
+                                    result.onResult(false);
+                                }
                             })
             );
         });
+    }
+
+    public void setLoginResult(LoginCallback result) {
+        this.result = result;
     }
 }
