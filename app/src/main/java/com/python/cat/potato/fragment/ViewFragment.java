@@ -8,9 +8,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
+import com.apkfuns.logutils.LogUtils;
 import com.python.cat.potato.R;
 import com.python.cat.potato.base.DrawerFragment;
+import com.python.cat.potato.utils.SizeUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,6 +52,14 @@ public class ViewFragment extends DrawerFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        View testView = view.findViewById(R.id.tv_test);
+
+        testView.post(() -> {
+            LogUtils.w("700dp==" + SizeUtils.dp2px(700));
+            LogUtils.w("testView " + testView.getWidth() + " , " + testView.getHeight());
+            ViewGroup parent = (ViewGroup) testView.getParent();
+            LogUtils.w("testView.parent " + parent.getWidth() + " , " + parent.getHeight());
+        });
     }
 
 

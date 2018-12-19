@@ -5,10 +5,22 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ViewFragment">
 
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:background="#3333"
+        android:orientation="vertical">
 
-    <com.python.cat.potato.view.CustomView
-        android:id="@+id/view_custom_ui"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <com.python.cat.potato.view.measure.ItemView
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:background="#600f" />
+
+        <TextView
+            android:id="@+id/tv_test"
+            android:layout_width="700dp"
+            android:layout_height="80dp"
+            android:text="@string/task_count" />
+    </LinearLayout>
 
 </FrameLayout>
