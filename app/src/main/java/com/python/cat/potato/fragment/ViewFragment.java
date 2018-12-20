@@ -52,14 +52,6 @@ public class ViewFragment extends DrawerFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        View testView = view.findViewById(R.id.tv_test);
-
-        testView.post(() -> {
-            LogUtils.w("700dp==" + SizeUtils.dp2px(700));
-            LogUtils.w("testView " + testView.getWidth() + " , " + testView.getHeight());
-            ViewGroup parent = (ViewGroup) testView.getParent();
-            LogUtils.w("testView.parent " + parent.getWidth() + " , " + parent.getHeight());
-        });
     }
 
 
