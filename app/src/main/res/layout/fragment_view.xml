@@ -5,37 +5,37 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ViewFragment">
 
+
     <com.python.cat.potato.view.measure.LineLayout
-        android:layout_width="match_parent"
-        android:background="#8444"
-        android:layout_height="wrap_content">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="100dp"
+        android:background="#8444">
 
         <TextView
-            android:padding="100dp"
-            android:background="#400f"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#400f"
             android:text="@string/task_count" />
 
         <TextView
-            android:padding="10dp"
-            android:background="#3f00"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
+            android:background="#3f00"
             android:gravity="center"
             android:text="@string/add_calendar_event" />
-
         <TextView
-            android:padding="10dp"
-            android:background="#60f0"
+            android:lines="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/bottom_sheet_behavior" />
-        <com.python.cat.potato.view.measure.ItemView
-            android:padding="100dp"
-            android:background="#000"
-            android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:background="#60f0"
+            android:text="@string/long_text" />
+
     </com.python.cat.potato.view.measure.LineLayout>
 
 </FrameLayout>
