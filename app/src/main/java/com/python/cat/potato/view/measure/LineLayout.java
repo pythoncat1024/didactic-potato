@@ -45,25 +45,60 @@ public class LineLayout extends ViewGroup {
         int height = 0;
         for (int i = 0; i < childCount; i++) {
             View child = getChildAt(i);
-            measureChild(child, widthMeasureSpec, heightMeasureSpec);
-            int ch = child.getMeasuredHeight();
-            int cw = child.getMeasuredWidth();
-            height += ch;
-            width = Math.max(cw, ws);
+            if (child.getVisibility() == GONE) {
+                continue;
+            }
+            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+//            measureChild(child, widthMeasureSpec, heightMeasureSpec);
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+            int measuredWidth = child.getMeasuredWidth();
+            int measuredHeight = child.getMeasuredHeight();
+            height += measuredHeight + lp.topMargin + lp.bottomMargin;
+            width = measuredWidth + lp.leftMargin + lp.rightMargin;
+            width = Math.min(width, ws);
         }
-        setMeasuredDimension(wm == MeasureSpec.EXACTLY ? ws : width,
-                hm == MeasureSpec.EXACTLY ? hs : height);
+        int finalW = wm == MeasureSpec.EXACTLY ? ws : width + getPaddingLeft() + getPaddingRight();
+        int finalH = hm == MeasureSpec.EXACTLY ? hs : height + getPaddingTop() + getPaddingBottom();
+        com.apkfuns.logutils.LogUtils.i("measure: " + finalW + " , " + finalH);
+        setMeasuredDimension(finalW, finalH);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int top = t;
+        com.apkfuns.logutils.LogUtils.d(String.format("%s -- %s , %s , %s , %s", changed, l, t, r, b));
+        t = getPaddingTop();
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
-            child.layout(l, top, l + child.getMeasuredWidth(), top + child.getMeasuredHeight());
-            top += child.getMeasuredHeight();
+            if (child.getVisibility() == GONE) {
+                continue;
+            }
+            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+//            LogUtils.d(lp);
+            l = lp.leftMargin + getPaddingLeft();
+            t = t + lp.topMargin;
+            r = l + child.getMeasuredWidth();
+            b = t + child.getMeasuredHeight();
+            child.layout(l, t, r, b);
+            t += child.getMeasuredHeight() + lp.bottomMargin;
+//            break;
+            com.apkfuns.logutils.LogUtils.d("item width:" + (lp.rightMargin + lp.leftMargin + child.getMeasuredWidth()));
         }
     }
 
+    @Override
+    protected MarginLayoutParams generateDefaultLayoutParams() {
+        return new MarginLayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
+    }
 
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new MarginLayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateLayoutParams(LayoutParams p) {
+        return new MarginLayoutParams(p);
+    }
 }
