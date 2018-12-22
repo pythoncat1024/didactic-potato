@@ -31,7 +31,6 @@ public class FlowLayout extends ViewGroup {
 //        LogUtils.d("size w=" + w + " ,,, h=" + h);
     }
 
-    int tempEnd = 0;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
