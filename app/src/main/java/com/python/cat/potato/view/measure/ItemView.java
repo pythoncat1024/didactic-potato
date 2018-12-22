@@ -33,12 +33,16 @@ public class ItemView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        // 1. 获取父控件的大小
+
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+        int paddingStart = getPaddingStart();
+        int paddingEnd = getPaddingEnd();
+        int paddingBottom = getPaddingBottom();
+        int paddingTop = getPaddingTop();
         LogUtils.d("default www=" + width + " , height=" + height);
-        int fw = resolveMeasure(widthMeasureSpec, MIN_WIDTH);
-        int fh = resolveMeasure(heightMeasureSpec, MIN_HEIGHT);
+        int fw = resolveMeasure(widthMeasureSpec, MIN_WIDTH) + paddingStart + paddingEnd;
+        int fh = resolveMeasure(heightMeasureSpec, MIN_HEIGHT) + paddingTop + paddingBottom;
         LogUtils.d("fw=" + fw + " , " + fh);
         setMeasuredDimension(fw, fh);
     }

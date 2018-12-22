@@ -11,12 +11,14 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:padding="100dp"
             android:background="#400f"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/task_count" />
 
         <TextView
+            android:padding="10dp"
             android:background="#3f00"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
@@ -24,10 +26,16 @@
             android:text="@string/add_calendar_event" />
 
         <TextView
+            android:padding="10dp"
             android:background="#60f0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/bottom_sheet_behavior" />
+        <com.python.cat.potato.view.measure.ItemView
+            android:padding="100dp"
+            android:background="#000"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
     </com.python.cat.potato.view.measure.LineLayout>
 
 </FrameLayout>
