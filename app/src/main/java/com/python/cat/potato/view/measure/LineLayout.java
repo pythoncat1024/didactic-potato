@@ -88,8 +88,8 @@ public class LineLayout extends ViewGroup {
 
     @Override
     protected MarginLayoutParams generateDefaultLayoutParams() {
-        return new MarginLayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
+        return new MarginLayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
     }
 
     @Override
