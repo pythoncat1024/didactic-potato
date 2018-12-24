@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    ~/Library/Android/sdk/platforms/android-28/data/res/values/attrs.xml
+    查看系统自定义属性
+    -->
+    <!--
+    使用系统属性，就不需要指定 format , 除非 要搞不同的 format
+    -->
+    <declare-styleable name="LineLayout">
+        <attr name="android:orientation" />
+        <attr name="android:showDividers" />
+        <attr name="android:dividerPadding" />
+        <attr name="android:divider" />
+        <attr name="android:gravity" />
+        <attr name="android:weightSum" />
+        <attr name="android:layout_gravity" />
+    </declare-styleable>
+
+    <!--
+    指定 LayoutParams 里面的属性 [给 child 使用的]
+    -->
+
+    <declare-styleable name="LineLayout_Layout">
+        <attr name="android:layout_weight" />
+        <attr name="android:layout_gravity" />
+        <attr name="layout_itemGone" format="boolean" />
+    </declare-styleable>
+
+</resources>
