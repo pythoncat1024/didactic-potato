@@ -5,306 +5,62 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ViewFragment">
 
-    <com.python.cat.potato.view.measure.FlowLayout
-        android:padding="2dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#3f00">
+ <com.python.cat.potato.view.measure.LineLayout
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
+     <ImageView
+         android:src="@drawable/ic_menu_camera"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
+     <ImageView
+         android:src="@drawable/ic_menu_camera"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
+     <ImageView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:src="@drawable/ic_menu_camera" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
+     <TextView
+         android:padding="6dp"
+         android:text="@string/title_activity_bottom"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_marginTop="9dp"
-            android:layout_marginBottom="43dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
+     <TextView
+         android:padding="6dp"
+         android:text="@string/title_activity_bottom"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
-        <ImageView
-            android:src="@drawable/ic_menu_camera"
-            android:layout_width="60dp"
-            android:layout_height="60dp" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:padding="3dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_drawable"
-            android:text="@string/add_calendar_event" />
+     <TextView
+         android:padding="6dp"
+         android:text="@string/title_activity_bottom"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
+     <ImageView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:src="@drawable/ic_menu_camera" />
 
+     <TextView
+         android:padding="6dp"
+         android:text="@string/title_activity_bottom"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
-    </com.python.cat.potato.view.measure.FlowLayout>
+     <ImageView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:src="@drawable/ic_menu_camera" />
 
+     <TextView
+         android:padding="6dp"
+         android:text="@string/title_activity_bottom"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
+ </com.python.cat.potato.view.measure.LineLayout>
 </FrameLayout>
