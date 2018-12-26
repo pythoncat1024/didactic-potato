@@ -6,83 +6,42 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ViewFragment">
 
-    <com.python.cat.potato.view.measure.LineLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#500f"
-        android:divider="@color/black"
-        android:dividerPadding="19dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:showDividers="beginning|middle|end|none"
-        android:visibility="visible">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_menu_camera" />
-
-        <TextView
-            android:layout_marginStart="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/title_activity_bottom" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="3dp"
-            android:src="@drawable/ic_menu_camera"
-            app:layout_itemGone="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/title_activity_bottom"
-            app:layout_itemGone="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="6dp"
-            android:text="@string/title_activity_bottom" />
-
-    </com.python.cat.potato.view.measure.LineLayout>
-
-
-    <LinearLayout
+    <com.python.cat.potato.view.measure.ItemLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:weightSum="1">
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_drawable"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_weight="1"
-            android:padding="6dp"
-            android:text="@string/title_activity_bottom" />
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginEnd="0dp"
+            android:background="@color/gray"
+            android:gravity="center"
+            android:text="@string/add_calendar_event"
+            android:visibility="visible" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_weight="1"
-            android:padding="6dp"
-            android:text="@string/title_activity_bottom" />
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="80dp"
+            android:background="@drawable/button_item_selector"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/app_name"
+            android:textColor="@color/item_selector" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:padding="6dp"
-            android:text="@string/title_activity_bottom" />
 
-    </LinearLayout>
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="80dp"
+            android:background="@drawable/button_item_selector"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/action_settings"
+            android:textColor="@color/item_selector" />
+
+
+
+    </com.python.cat.potato.view.measure.ItemLayout>
+
 </FrameLayout>
