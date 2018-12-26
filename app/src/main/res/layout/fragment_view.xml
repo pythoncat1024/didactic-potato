@@ -7,8 +7,10 @@
     tools:context=".fragment.ViewFragment">
 
     <com.python.cat.potato.view.measure.ItemLayout
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="1dp"
         android:background="@drawable/border_drawable"
         android:orientation="horizontal">
 
