@@ -87,10 +87,10 @@ class CookieInterceptor implements Interceptor {
         Request request = chain.request();
         Response response = chain.proceed(request);
         Headers headers = response.headers();
-        LogUtils.e(headers);
+        LogUtils.v(headers);
         Map<String, List<String>> listMap = headers.toMultimap();
         LogUtils.e("=================" + headers.size() + " xxx " + listMap.size());
-        LogUtils.e(listMap);
+        LogUtils.v(listMap);
         StringBuilder cookies = new StringBuilder();
         for (Map.Entry<String, List<String>> next : listMap.entrySet()) {
             String key = next.getKey();
@@ -111,8 +111,8 @@ class CookieInterceptor implements Interceptor {
         if (!TextUtils.isEmpty(cookies)) {
             SpUtils.put(BaseApplication.get(), GlobalInfo.SP_KEY_COOKIE, cookies.toString());
         }
-        LogUtils.e("COOKIE:" + cookies);
-        LogUtils.v("COOKIE:" + SpUtils.get(BaseApplication.get(), GlobalInfo.SP_KEY_COOKIE));
+//        LogUtils.v("COOKIE:" + cookies);
+//        LogUtils.v("COOKIE:" + SpUtils.get(BaseApplication.get(), GlobalInfo.SP_KEY_COOKIE));
         return response;
     }
 }

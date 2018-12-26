@@ -79,6 +79,10 @@ public class LoginFragment extends BaseFragment {
                                     LogUtils.d("login success...");
                                     ToastHelper.show(BaseApplication.get(), "login success");
                                     SpUtils.put(getContext(), GlobalInfo.SP_KEY_USERNAME, username);
+                                    if (result != null) {
+                                        result.onResult(true);
+                                        // 通过回调触发新逻辑[跳转到新的 fragment ]
+                                    }
                                 } else {
                                     throw new Exception(info.errorMsg);
                                 }

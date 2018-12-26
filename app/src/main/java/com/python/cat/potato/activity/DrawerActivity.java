@@ -182,6 +182,8 @@ public class DrawerActivity extends BaseActivity
         fragment.setNeedLogin(() -> {
             ToastHelper.show(BaseApplication.get(), "need login first!");
             showLoginFragment(success -> {
+
+                LogUtils.w("login result...");
                 if (success) {
                     navigationView.setCheckedItem(R.id.nav_todo);
                     showTODOFragment();
@@ -201,7 +203,6 @@ public class DrawerActivity extends BaseActivity
         if (checkedItem != null) {
             checkedItem.setChecked(false);
         }
-        com.apkfuns.logutils.LogUtils.v("click nav header...");
         LoginFragment fragment = LoginFragment.newInstance();
         fragment.setLoginResult(callback);
         FragmentManager fragmentManager = getSupportFragmentManager();
