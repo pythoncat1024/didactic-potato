@@ -1,5 +1,6 @@
 package com.python.cat.potato.view.measure;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -157,8 +158,14 @@ public class ItemLayout extends LinearLayout {
                     // xV>0 , 说明从左往右滑动了 ==> 回到初始值 【关闭menu】
 
                     LogUtils.e("menu close: ▶️ -->");
-//                    scrollBy(-getScrollX(), 0);
-                    scrollTo(0, 0);
+                    //                    scrollBy(-getScrollX(), 0);
+                    //                    scrollTo(0, 0);
+                    ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), 0);
+                    animator.addUpdateListener(animation -> {
+                        Integer value = (Integer) animation.getAnimatedValue();
+                        scrollTo(value, 0);
+                    });
+                    animator.start();
                 } else {
                     int menuWidths = 0;
                     for (int i = 1; i < getChildCount(); i++) {
@@ -168,10 +175,16 @@ public class ItemLayout extends LinearLayout {
                         menuWidths += width + lp.leftMargin + lp.rightMargin;
                     }
                     LogUtils.e("menu open: ◀️️ <--");
-                    scrollTo(menuWidths, 0);
+                    //                    scrollTo(menuWidths, 0);
+                    ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), menuWidths);
+                    animator.addUpdateListener(animation -> {
+                        Integer value = (Integer) animation.getAnimatedValue();
+                        scrollTo(value, 0);
+                    });
+                    // animator.setDuration(600);
+                    animator.start();
                 }
-
-//
+                //
                 downX = upX;
                 downY = upY;
                 vTracker.clear();
@@ -248,17 +261,17 @@ public class ItemLayout extends LinearLayout {
 
         // moveChild / scrollBy 都可以 ！
 
-//        scrollBy(-diffX, 0);
-        scrollTo(getScrollX()-diffX,0);
+        //        scrollBy(-diffX, 0);
+        scrollTo(getScrollX() - diffX, 0);
 
-//        for (int i = 0; i < getChildCount(); i++) {
-//            View child = getChildAt(i);
-//            if (child == null || child.getVisibility() == GONE) {
-//                continue;
-//            }
-//            moveChild(child, diffX, 0);
-//
-//        }
+        //        for (int i = 0; i < getChildCount(); i++) {
+        //            View child = getChildAt(i);
+        //            if (child == null || child.getVisibility() == GONE) {
+        //                continue;
+        //            }
+        //            moveChild(child, diffX, 0);
+        //
+        //        }
     }
 
 
