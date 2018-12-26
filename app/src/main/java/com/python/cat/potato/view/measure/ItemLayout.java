@@ -1,5 +1,6 @@
 package com.python.cat.potato.view.measure;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -139,26 +140,38 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_UP: {
                 // 收到抬起事件，如果 down 的时候返回了 true
                 LogUtils.i("up # up");
+                int minVelocity = viewConfig.getScaledMinimumFlingVelocity();
                 vTracker.computeCurrentVelocity(1000); // 先计算
                 float xVelocity = vTracker.getXVelocity(); // 再求值
                 float yVelocity = vTracker.getYVelocity();
-                LogUtils.e("velocity#UP=(%s,%s)", xVelocity, yVelocity);
-                // 向左滑动，xV<0 ; 向右 xV>0 ;
+                LogUtils.e("velocity#UP=(%s,%s) ### min=%s",
+                        Math.round(xVelocity), Math.round(yVelocity), minVelocity);
+                // xV>0, 说明从左往右滑动了；
+                // xV<0, 说明从右往左滑动了；
                 int upX = Math.round(event.getX());
                 int upY = Math.round(event.getY());
                 int[] diff = getTouchDiff(downX, downY, upX, upY);
                 int diffX = diff[0];
                 int diffY = diff[1];
                 // 03 end. 处理逻辑之后，重置 down
-                int minVelocity = viewConfig.getScaledMinimumFlingVelocity();
-                if (Math.abs(xVelocity) > minVelocity) {
-                    // 滑动速度超过最小允许 fling 的值了，可以抛了
-                    LogUtils.e("可以抛了 velocity：" + xVelocity + " ### " + getScrollX());
+                if (xVelocity > 0) {
+                    // xV>0 , 说明从左往右滑动了 ==> 回到初始值 【关闭menu】
+
+                    LogUtils.e("menu close: ▶️ -->");
+                    scrollBy(-getScrollX(), 0);
                 } else {
-                    // 不能抛，速度太小了...
+                    int menuWidths = 0;
+                    for (int i = 1; i < getChildCount(); i++) {
+                        View temp = getChildAt(i);
+                        MarginLayoutParams lp = (MarginLayoutParams) temp.getLayoutParams();
+                        int width = temp.getWidth();
+                        menuWidths += width + lp.leftMargin + lp.rightMargin;
+                    }
+                    LogUtils.e("menu open: ◀️️ <--");
+                    scrollTo(menuWidths, 0);
                 }
 
-                scrollBy(-getScrollX(),0);
+//
                 downX = upX;
                 downY = upY;
                 vTracker.clear();
