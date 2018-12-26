@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -16,6 +17,7 @@ public class ItemLayout extends LinearLayout {
 
 
     private int downX, downY;
+    private ViewConfiguration viewConfig;
 
     public ItemLayout(Context context) {
         this(context, null);
@@ -33,6 +35,8 @@ public class ItemLayout extends LinearLayout {
                       int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         LogUtils.getLogConfig().configTagPrefix("ItemLayout");
+        viewConfig = ViewConfiguration.get(getContext());
+        LogUtils.e(viewConfig);
     }
 
     @Override
@@ -50,6 +54,7 @@ public class ItemLayout extends LinearLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        // 注意这个方法，无论返回值是什么，move up 都是会走的
         boolean b = super.onInterceptHoverEvent(event);
         LogUtils.d("intercept-- " + b);
         switch (event.getActionMasked()) {
@@ -57,11 +62,24 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 // 收到点击事件，未必拦截了
                 LogUtils.d("down");
+                downX = Math.round(event.getX());
+                downY = Math.round(event.getY());
             }
             break;
             case MotionEvent.ACTION_MOVE: {
                 // 收到滑动事件，未必拦截了
                 LogUtils.d("move");
+                // 01 获取diff
+                int moveX = Math.round(event.getX());
+                int moveY = Math.round(event.getY());
+                int[] diff = getTouchDiff(downX, downY, moveX, moveY);
+                int diffX = diff[0];
+                int diffY = diff[1];
+                int touchSlop = viewConfig.getScaledTouchSlop();
+                if (diffX > touchSlop) {
+                    LogUtils.w("需要处理滑动了：" + diffX);
+                    return true;
+                }
             }
             break;
             case MotionEvent.ACTION_UP: {
@@ -88,8 +106,6 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 // 收到点击事件，如果要处理，就必须返回 true
                 LogUtils.i("down # down");
-                downX = Math.round(event.getX());
-                downY = Math.round(event.getY());
             }
             break;
             case MotionEvent.ACTION_MOVE: {
@@ -135,7 +151,7 @@ public class ItemLayout extends LinearLayout {
             if (child == null || child.getVisibility() == GONE) {
                 continue;
             }
-            moveChild(child, diffX, diffY);
+            moveChild(child, diffX, 0);
         }
 
     }
@@ -159,10 +175,11 @@ public class ItemLayout extends LinearLayout {
         // getRight() + diffX,
         // getBottom() + diffY
         // );
+//        diffY = 0; // 永远不处理上下滑动
         int l = child.getLeft() + diffX;
-        int t = child.getTop() + 0;
+        int t = child.getTop() + diffY;
         int r = child.getRight() + diffX;
-        int b = child.getBottom() + 0;
+        int b = child.getBottom() + diffY;
         child.layout(l, t, r, b);
     }
 }
