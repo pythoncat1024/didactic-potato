@@ -153,36 +153,29 @@ public class ItemLayout extends LinearLayout {
                 int[] diff = getTouchDiff(downX, downY, upX, upY);
                 int diffX = diff[0];
                 int diffY = diff[1];
+                int menuWidths = 0;
+                for (int i = 1; i < getChildCount(); i++) {
+                    View temp = getChildAt(i);
+                    MarginLayoutParams lp = (MarginLayoutParams) temp.getLayoutParams();
+                    int width = temp.getWidth();
+                    menuWidths += width + lp.leftMargin + lp.rightMargin;
+                }
                 // 03 end. 处理逻辑之后，重置 down
-                if (xVelocity > 0) {
+                boolean fastSpeed = Math.abs(xVelocity) > minVelocity;
+                if (xVelocity > 0 && fastSpeed) {
                     // xV>0 , 说明从左往右滑动了 ==> 回到初始值 【关闭menu】
-
-                    LogUtils.e("menu close: ▶️ -->");
-                    //                    scrollBy(-getScrollX(), 0);
-                    //                    scrollTo(0, 0);
-                    ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), 0);
-                    animator.addUpdateListener(animation -> {
-                        Integer value = (Integer) animation.getAnimatedValue();
-                        scrollTo(value, 0);
-                    });
-                    animator.start();
+                    closeMenu();
+                } else if (xVelocity < 0 && fastSpeed) {
+                    openMenu(menuWidths);
                 } else {
-                    int menuWidths = 0;
-                    for (int i = 1; i < getChildCount(); i++) {
-                        View temp = getChildAt(i);
-                        MarginLayoutParams lp = (MarginLayoutParams) temp.getLayoutParams();
-                        int width = temp.getWidth();
-                        menuWidths += width + lp.leftMargin + lp.rightMargin;
+                    // 速度 == 0 ，说明是滑动之后停止，然后再抬起手指的，这时候，就判断距离吧
+                    if (Math.abs(getScaleX()) > menuWidths / 2) {
+                        // 滑动距离超过 1/2 , openMenu
+                        openMenu(menuWidths);
+                    } else {
+                        // closeMenu
+                        closeMenu();
                     }
-                    LogUtils.e("menu open: ◀️️ <--");
-                    //                    scrollTo(menuWidths, 0);
-                    ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), menuWidths);
-                    animator.addUpdateListener(animation -> {
-                        Integer value = (Integer) animation.getAnimatedValue();
-                        scrollTo(value, 0);
-                    });
-                    // animator.setDuration(600);
-                    animator.start();
                 }
                 //
                 downX = upX;
@@ -199,6 +192,30 @@ public class ItemLayout extends LinearLayout {
         return true;
     }
 
+    private void closeMenu() {
+        LogUtils.e("menu close: ▶️ -->");
+        //                    scrollBy(-getScrollX(), 0);
+        //                    scrollTo(0, 0);
+        ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), 0);
+        animator.addUpdateListener(animation -> {
+            Integer value = (Integer) animation.getAnimatedValue();
+            scrollTo(value, 0);
+        });
+        animator.start();
+    }
+
+    private void openMenu(int menuWidths) {
+        LogUtils.e("menu open: ◀️️ <--");
+        //                    scrollTo(menuWidths, 0);
+        ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), menuWidths);
+        animator.addUpdateListener(animation -> {
+            Integer value = (Integer) animation.getAnimatedValue();
+            scrollTo(value, 0);
+        });
+        // animator.setDuration(600);
+        animator.start();
+    }
+
     @Override
     public boolean performClick() {
         boolean b = super.performClick();
@@ -208,10 +225,12 @@ public class ItemLayout extends LinearLayout {
 
 
     private boolean checkScrollEdge(int diffX, int diffY) {
+
         if (Math.abs(diffX) < viewConfig.getScaledTouchSlop()) {
-            // 滑动距离过小，就不滑动
+            // 滑动距离过小，就不滑动 == 这个实际效果不好，去掉
             Log.v("scroll", "too small deltaX to scroll! ## " + diffX + " , " + diffY);
-            return false;
+            // 实际现象是感觉触摸不灵敏，反应迟钝的样子
+            //            return false;
         }
         boolean canScroll;
         // 如果当前 view 停留在初始值左边了， scrollX > 0 ;
