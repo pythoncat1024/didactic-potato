@@ -2,10 +2,11 @@ package com.python.cat.potato.view.measure;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.apkfuns.logutils.LogUtils;
@@ -15,9 +16,11 @@ import com.apkfuns.logutils.LogUtils;
  */
 public class ItemLayout extends LinearLayout {
 
+    public static final String TAG = "ItemLayout#scroll";
 
     private int downX, downY;
     private ViewConfiguration viewConfig;
+    private VelocityTracker vTracker; // 速度追踪器
 
     public ItemLayout(Context context) {
         this(context, null);
@@ -36,7 +39,7 @@ public class ItemLayout extends LinearLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
         LogUtils.getLogConfig().configTagPrefix("ItemLayout");
         viewConfig = ViewConfiguration.get(getContext());
-        LogUtils.e(viewConfig);
+        // LogUtils.e(viewConfig);
     }
 
     @Override
@@ -76,7 +79,8 @@ public class ItemLayout extends LinearLayout {
                 int diffX = diff[0];
                 int diffY = diff[1];
                 int touchSlop = viewConfig.getScaledTouchSlop();
-                if (diffX > touchSlop) {
+                if (Math.abs(diffX) > touchSlop) {
+                    // 一定要取绝对值，否则，向左滑动永远不满足条件
                     LogUtils.w("需要处理滑动了：" + diffX);
                     return true;
                 }
@@ -98,11 +102,11 @@ public class ItemLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        vTracker.addMovement(event);
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
             performClick();
         }
         switch (event.getActionMasked()) {
-
             case MotionEvent.ACTION_DOWN: {
                 // 收到点击事件，如果要处理，就必须返回 true
                 LogUtils.i("down # down");
@@ -119,17 +123,45 @@ public class ItemLayout extends LinearLayout {
                 int[] diff = getTouchDiff(downX, downY, moveX, moveY);
                 int diffX = diff[0];
                 int diffY = diff[1];
-                // 02 处理逻辑
-                handlerLayoutByDiff(diffX, diffY);
+                // 01-1 滑动边界值检查
 
+                boolean canScroll = checkScrollEdge(diffX, diffY);
+                // 02 处理逻辑 （包含滑动边界检测）
+                if (canScroll) {
+                    handlerLayoutByDiff(diffX, diffY);
+                }
                 // 03 end. 处理逻辑之后，重置 down
                 downX = moveX;
                 downY = moveY;
+
             }
             break;
             case MotionEvent.ACTION_UP: {
                 // 收到抬起事件，如果 down 的时候返回了 true
                 LogUtils.i("up # up");
+                vTracker.computeCurrentVelocity(1000); // 先计算
+                float xVelocity = vTracker.getXVelocity(); // 再求值
+                float yVelocity = vTracker.getYVelocity();
+                LogUtils.e("velocity#UP=(%s,%s)", xVelocity, yVelocity);
+                // 向左滑动，xV<0 ; 向右 xV>0 ;
+                int upX = Math.round(event.getX());
+                int upY = Math.round(event.getY());
+                int[] diff = getTouchDiff(downX, downY, upX, upY);
+                int diffX = diff[0];
+                int diffY = diff[1];
+                // 03 end. 处理逻辑之后，重置 down
+                int minVelocity = viewConfig.getScaledMinimumFlingVelocity();
+                if (Math.abs(xVelocity) > minVelocity) {
+                    // 滑动速度超过最小允许 fling 的值了，可以抛了
+                    LogUtils.e("可以抛了 velocity：" + xVelocity + " ### " + getScrollX());
+                } else {
+                    // 不能抛，速度太小了...
+                }
+
+                scrollBy(-getScrollX(),0);
+                downX = upX;
+                downY = upY;
+                vTracker.clear();
             }
             break;
             case MotionEvent.ACTION_CANCEL: {
@@ -138,22 +170,7 @@ public class ItemLayout extends LinearLayout {
             }
             break;
         }
-        boolean b = super.onTouchEvent(event);
-        LogUtils.d("touch-- " + b);
         return true;
-    }
-
-    private void handlerLayoutByDiff(int diffX, int diffY) {
-        // moveChild 获取 scrollBy 都可以 ！
-        //  scrollBy(-diffX, 0);
-        for (int i = 0; i < getChildCount(); i++) {
-            View child = getChildAt(i);
-            if (child == null || child.getVisibility() == GONE) {
-                continue;
-            }
-            moveChild(child, diffX, 0);
-        }
-
     }
 
     @Override
@@ -164,18 +181,79 @@ public class ItemLayout extends LinearLayout {
     }
 
 
+    private boolean checkScrollEdge(int diffX, int diffY) {
+        if (Math.abs(diffX) < viewConfig.getScaledTouchSlop()) {
+            // 滑动距离过小，就不滑动
+            Log.v("scroll", "too small deltaX to scroll! ## " + diffX + " , " + diffY);
+            return false;
+        }
+        boolean canScroll;
+        // 如果当前 view 停留在初始值左边了， scrollX > 0 ;
+        // 如果 view 停留在初始位置右边了， scrollX < 0 ;
+        int scrollX = getScrollX();
+        // scrollX --> 表示当前位置(滑动后)，比初始位置 的 x 的距离
+        int menuWidths = 0;
+        for (int i = 1; i < getChildCount(); i++) {
+            View temp = getChildAt(i);
+            MarginLayoutParams lp = (MarginLayoutParams) temp.getLayoutParams();
+            int width = temp.getWidth();
+            menuWidths += width + lp.leftMargin + lp.rightMargin;
+        }
+        if (scrollX - diffX < 0) {
+            // 不能向左滑动了，直接移动到初始位置
+            // scrollTo(-scrollX, 0); // 调用的话，画面抖动频繁
+            Log.v(TAG, "too left , can not scroll");
+            canScroll = false;
+        } else if (scrollX - diffX > menuWidths) {
+            // 不能再向右滑动了
+            // scrollTo(-scrollX, 0); // 调用的话，画面抖动频繁
+            Log.v(TAG, "too right , can not scroll");
+            canScroll = false;
+        } else {
+            canScroll = true;
+        }
+        return canScroll;
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (vTracker == null) {
+            vTracker = VelocityTracker.obtain();
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (vTracker != null) {
+            vTracker.recycle();
+        }
+    }
+
+    private void handlerLayoutByDiff(int diffX, int diffY) {
+
+        // moveChild / scrollBy 都可以 ！
+
+        scrollBy(-diffX, 0);
+
+//        for (int i = 0; i < getChildCount(); i++) {
+//            View child = getChildAt(i);
+//            if (child == null || child.getVisibility() == GONE) {
+//                continue;
+//            }
+//            moveChild(child, diffX, 0);
+//
+//        }
+    }
+
+
     private int[] getTouchDiff(int startX, int startY, int endX, int endY) {
         return new int[]{endX - startX, endY - startY};
     }
 
     private void moveChild(View child, int diffX, int diffY) {
-        // layout(
-        // getLeft() + diffX,
-        // getTop() + diffY,
-        // getRight() + diffX,
-        // getBottom() + diffY
-        // );
-//        diffY = 0; // 永远不处理上下滑动
+        //  diffY = 0; // 永远不处理上下滑动
         int l = child.getLeft() + diffX;
         int t = child.getTop() + diffY;
         int r = child.getRight() + diffX;
