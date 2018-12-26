@@ -1,6 +1,5 @@
 package com.python.cat.potato.view.measure;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -158,7 +157,8 @@ public class ItemLayout extends LinearLayout {
                     // xV>0 , 说明从左往右滑动了 ==> 回到初始值 【关闭menu】
 
                     LogUtils.e("menu close: ▶️ -->");
-                    scrollBy(-getScrollX(), 0);
+//                    scrollBy(-getScrollX(), 0);
+                    scrollTo(0, 0);
                 } else {
                     int menuWidths = 0;
                     for (int i = 1; i < getChildCount(); i++) {
@@ -248,7 +248,8 @@ public class ItemLayout extends LinearLayout {
 
         // moveChild / scrollBy 都可以 ！
 
-        scrollBy(-diffX, 0);
+//        scrollBy(-diffX, 0);
+        scrollTo(getScrollX()-diffX,0);
 
 //        for (int i = 0; i < getChildCount(); i++) {
 //            View child = getChildAt(i);
