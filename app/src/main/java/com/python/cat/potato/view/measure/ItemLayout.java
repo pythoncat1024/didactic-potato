@@ -29,8 +29,9 @@ public class ItemLayout extends LinearLayout {
 
     public static final int MENU_CLOSE = 0;
     public static final int MENU_OPEN = 1;
+    public static final int MENU_SCROLLING = 2;
 
-    @IntDef(value = {MENU_CLOSE, MENU_OPEN})
+    @IntDef(value = {MENU_CLOSE, MENU_OPEN, MENU_SCROLLING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MenuState {
     }
@@ -181,6 +182,8 @@ public class ItemLayout extends LinearLayout {
                 // 01-1 滑动边界值检查
 
                 boolean canScroll = checkScrollEdge(diffX, diffY);
+
+                LogUtils.e("touch move canScroll ? " + canScroll);
                 // 02 处理逻辑 （包含滑动边界检测）
                 if (canScroll) {
                     getParent().requestDisallowInterceptTouchEvent(true);
@@ -195,6 +198,8 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_UP: {
                 // 收到抬起事件，如果 down 的时候返回了 true
                 LogUtils.i("touch up # up");
+                if (!checkScroll())
+                    return false;
                 int minVelocity = viewConfig.getScaledMinimumFlingVelocity();
                 vTracker.computeCurrentVelocity(1000); // 先计算
                 float xVelocity = vTracker.getXVelocity(); // 再求值
@@ -273,13 +278,19 @@ public class ItemLayout extends LinearLayout {
             scrollTo(value, 0);
         });
         animator.start();
+        animator.setDuration(3000);
+        this.setCurrentMenuState(MENU_SCROLLING);
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 setCurrentMenuState(MENU_CLOSE);
-                currentLayout = null;
-                isLastClosing = false;
+                if (currentLayout == ItemLayout.this) {
+                    currentLayout = null;
+                    isLastClosing = false;
+                } else {
+                    throw new RuntimeException("找原因，为什么会出现这种情况？");
+                }
             }
         });
     }
@@ -288,23 +299,20 @@ public class ItemLayout extends LinearLayout {
         if (currentLayout == null) {
             currentLayout = ItemLayout.this;
         } else {
-            if (currentLayout.equals(ItemLayout.this)) {
-
-            } else {
-                currentLayout.closeMenu();
-                currentLayout = ItemLayout.this;
-                LogUtils.e("menu close last,not really open : ◀<--");
-                return;
-            }
+            currentLayout.closeMenu();
+            currentLayout = ItemLayout.this;
+            LogUtils.e("menu close last,not really open : ◀<--");
+            return;
         }
         LogUtils.e("menu open: ◀️️ <--");
         //                    scrollTo(menuWidths, 0);
+        this.setCurrentMenuState(MENU_SCROLLING);
         ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), menuWidths);
         animator.addUpdateListener(animation -> {
             Integer value = (Integer) animation.getAnimatedValue();
             scrollTo(value, 0);
         });
-        // animator.setDuration(600);
+        animator.setDuration(3000);
         animator.start();
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -337,7 +345,6 @@ public class ItemLayout extends LinearLayout {
         }
         boolean canScroll;
 
-
         // 如果当前 view 停留在初始值左边了， scrollX > 0 ;
         // 如果 view 停留在初始位置右边了， scrollX < 0 ;
         int scrollX = getScrollX();
@@ -360,20 +367,31 @@ public class ItemLayout extends LinearLayout {
             Log.v(TAG, "too right , can not scroll");
             canScroll = false;
         } else {
-            canScroll = true;
-            // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### start
-            if (currentLayout != null
-                    && currentLayout != ItemLayout.this
-                    && currentLayout.getCurrentMenuState() == MENU_OPEN) {
-                canScroll = false;
-            }
-            if (isLastClosing) {
-                canScroll = false;
-            }
-            // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### end
+            canScroll = checkScroll();
         }
 
 
+        return canScroll;
+    }
+
+    private boolean checkScroll() {
+        boolean canScroll;
+        canScroll = true;
+        // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### start
+        if (currentLayout != null
+                && currentLayout != ItemLayout.this
+                && currentLayout.getCurrentMenuState() != MENU_CLOSE) {
+            canScroll = false;
+        }
+        if (isLastClosing) {
+            canScroll = false;
+        }
+        // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### end
+
+        // add condition for scrolling
+        if (this.getCurrentMenuState() == MENU_SCROLLING) {
+            canScroll = false;
+        }
         return canScroll;
     }
 
