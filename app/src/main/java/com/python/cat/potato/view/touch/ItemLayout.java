@@ -1,4 +1,4 @@
-package com.python.cat.potato.view.measure;
+package com.python.cat.potato.view.touch;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 
 import com.apkfuns.logutils.LogUtils;
@@ -23,15 +24,15 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class ItemLayout extends LinearLayout {
 
-    private static ItemLayout currentLayout;
-
-    private static boolean isLastClosing = false;
 
     public static final int MENU_CLOSE = 0;
     public static final int MENU_OPEN = 1;
     public static final int MENU_SCROLLING = 2;
+    public static final int MENU_MOVING = 3;
+    private ValueAnimator openMenuAnimator;
+    private ValueAnimator closeMenuAnimator;
 
-    @IntDef(value = {MENU_CLOSE, MENU_OPEN, MENU_SCROLLING})
+    @IntDef(value = {MENU_CLOSE, MENU_OPEN, MENU_SCROLLING, MENU_MOVING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MenuState {
     }
@@ -110,16 +111,22 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 // 收到点击事件，未必拦截了
                 LogUtils.d("intercept down");
-                if (currentLayout != null
-                        && currentLayout != ItemLayout.this
-                        && currentLayout.getCurrentMenuState() == MENU_OPEN) {
-                    currentLayout.closeMenu();
-                    isLastClosing = true;
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                    return true;
-                }
                 downX = Math.round(event.getX());
                 downY = Math.round(event.getY());
+                if (this.getCurrentMenuState() == MENU_SCROLLING) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                } else if (this.getCurrentMenuState() == MENU_OPEN) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    if (openMenuAnimator != null && openMenuAnimator.isRunning()) {
+                        openMenuAnimator.cancel();
+                    }
+                    if (closeMenuAnimator == null) {
+                        closeMenu();
+                    } else if (!closeMenuAnimator.isRunning()) {
+                        // 已经是在关闭过程中，就不用管
+                        closeMenu();
+                    }
+                }
             }
             break;
             case MotionEvent.ACTION_MOVE: {
@@ -133,7 +140,8 @@ public class ItemLayout extends LinearLayout {
                 int diffY = diff[1];
                 int touchSlop = viewConfig.getScaledTouchSlop();
                 if (Math.abs(diffX) > touchSlop
-                        && Math.abs(diffX) > Math.abs(diffY)) {
+                        && Math.abs(diffX) > Math.abs(diffY)
+                        && this.getCurrentMenuState() != MENU_SCROLLING) {
                     // 一定要取绝对值，否则，向左滑动永远不满足条件
                     LogUtils.w("需要处理滑动了：" + diffX);
                     // 如果 parent 也会处理滑动事件，此时让 parent 不要处理
@@ -166,6 +174,9 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 // 收到点击事件，如果要处理，就必须返回 true
                 LogUtils.i("touch down # down");
+                if (this.getCurrentMenuState() == MENU_SCROLLING) {
+                    return false; // 不处理本次的 move,up, 等后续事件
+                }
             }
             break;
             case MotionEvent.ACTION_MOVE: {
@@ -181,11 +192,13 @@ public class ItemLayout extends LinearLayout {
                 int diffY = diff[1];
                 // 01-1 滑动边界值检查
 
-                boolean canScroll = checkScrollEdge(diffX, diffY);
+                boolean canScroll = checkScrollEdge(diffX, diffY)
+                        && this.getCurrentMenuState() != MENU_SCROLLING;
 
-                LogUtils.e("touch move canScroll ? " + canScroll);
+                LogUtils.e("touch move canScroll ? " + canScroll + " , " + mCurrentMenuState);
                 // 02 处理逻辑 （包含滑动边界检测）
                 if (canScroll) {
+                    LogUtils.e("touch move scrollTo ? ");
                     getParent().requestDisallowInterceptTouchEvent(true);
                     handlerLayoutByDiff(diffX, diffY);
                 }
@@ -198,7 +211,11 @@ public class ItemLayout extends LinearLayout {
             case MotionEvent.ACTION_UP: {
                 // 收到抬起事件，如果 down 的时候返回了 true
                 LogUtils.i("touch up # up");
-                if (!checkScroll())
+                boolean canAutoScroll = checkScroll()  // 在滑动边界内
+                        && this.getCurrentMenuState() != MENU_SCROLLING; // 上次的滑动已经结束
+
+                LogUtils.e("touch up autoScroll: " + canAutoScroll);
+                if (!canAutoScroll)
                     return false;
                 int minVelocity = viewConfig.getScaledMinimumFlingVelocity();
                 vTracker.computeCurrentVelocity(1000); // 先计算
@@ -269,56 +286,58 @@ public class ItemLayout extends LinearLayout {
 
     public void closeMenu() {
 
-        LogUtils.e("menu close: ▶️ -->");
+        LogUtils.e("touch up menu close: ▶️ -->");
         //                    scrollBy(-getScrollX(), 0);
         //                    scrollTo(0, 0);
-        ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), 0);
-        animator.addUpdateListener(animation -> {
+        final int lastState = getCurrentMenuState();
+        closeMenuAnimator = ValueAnimator.ofInt(getScrollX(), 0);
+        closeMenuAnimator.addUpdateListener(animation -> {
             Integer value = (Integer) animation.getAnimatedValue();
             scrollTo(value, 0);
         });
-        animator.start();
-        animator.setDuration(3000);
+        closeMenuAnimator.setDuration(3000);
+        closeMenuAnimator.setInterpolator(new DecelerateInterpolator());
+        closeMenuAnimator.start();
         this.setCurrentMenuState(MENU_SCROLLING);
-        animator.addListener(new AnimatorListenerAdapter() {
+        closeMenuAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 setCurrentMenuState(MENU_CLOSE);
-                if (currentLayout == ItemLayout.this) {
-                    currentLayout = null;
-                    isLastClosing = false;
-                } else {
-                    throw new RuntimeException("找原因，为什么会出现这种情况？");
-                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                setCurrentMenuState(lastState);
             }
         });
     }
 
     private void openMenu(int menuWidths) {
-        if (currentLayout == null) {
-            currentLayout = ItemLayout.this;
-        } else {
-            currentLayout.closeMenu();
-            currentLayout = ItemLayout.this;
-            LogUtils.e("menu close last,not really open : ◀<--");
-            return;
-        }
-        LogUtils.e("menu open: ◀️️ <--");
+        LogUtils.e("touch up menu open: ◀️️ <--");
         //                    scrollTo(menuWidths, 0);
+        final int lastState = getCurrentMenuState();
         this.setCurrentMenuState(MENU_SCROLLING);
-        ValueAnimator animator = ValueAnimator.ofInt(getScrollX(), menuWidths);
-        animator.addUpdateListener(animation -> {
+        openMenuAnimator = ValueAnimator.ofInt(getScrollX(), menuWidths);
+        openMenuAnimator.addUpdateListener(animation -> {
             Integer value = (Integer) animation.getAnimatedValue();
             scrollTo(value, 0);
         });
-        animator.setDuration(3000);
-        animator.start();
-        animator.addListener(new AnimatorListenerAdapter() {
+        openMenuAnimator.setInterpolator(new DecelerateInterpolator());
+        openMenuAnimator.setDuration(3000);
+        openMenuAnimator.start();
+        openMenuAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 setCurrentMenuState(MENU_OPEN);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                setCurrentMenuState(lastState);
             }
         });
     }
@@ -378,14 +397,6 @@ public class ItemLayout extends LinearLayout {
         boolean canScroll;
         canScroll = true;
         // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### start
-        if (currentLayout != null
-                && currentLayout != ItemLayout.this
-                && currentLayout.getCurrentMenuState() != MENU_CLOSE) {
-            canScroll = false;
-        }
-        if (isLastClosing) {
-            canScroll = false;
-        }
         // 添加判断，如果当前有 menu 是展开的情况，并且滑动的不是这个 menu #### end
 
         // add condition for scrolling
@@ -407,25 +418,13 @@ public class ItemLayout extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (vTracker != null) {
-            //            vTracker.recycle();
+            // vTracker.recycle();
         }
     }
 
     private void handlerLayoutByDiff(int diffX, int diffY) {
-
         // moveChild / scrollBy 都可以 ！
-
-        //        scrollBy(-diffX, 0);
         scrollTo(getScrollX() - diffX, 0);
-
-        //        for (int i = 0; i < getChildCount(); i++) {
-        //            View child = getChildAt(i);
-        //            if (child == null || child.getVisibility() == GONE) {
-        //                continue;
-        //            }
-        //            moveChild(child, diffX, 0);
-        //
-        //        }
     }
 
 
@@ -433,12 +432,4 @@ public class ItemLayout extends LinearLayout {
         return new int[]{endX - startX, endY - startY};
     }
 
-    private void moveChild(View child, int diffX, int diffY) {
-        //  diffY = 0; // 永远不处理上下滑动
-        int l = child.getLeft() + diffX;
-        int t = child.getTop() + diffY;
-        int r = child.getRight() + diffX;
-        int b = child.getBottom() + diffY;
-        child.layout(l, t, r, b);
-    }
 }
